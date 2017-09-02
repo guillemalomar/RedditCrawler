@@ -8,6 +8,7 @@
 ***********************************************/
 '''
 
+from database.database import Database
 # from crawler.crawler import Crawler
 # from rest_api.rest_api import import RestAPI
 
@@ -29,6 +30,7 @@ if __name__ == "__main__":
     message_output()
 
     # Create a Database and start it
+    my_db = Database('data/dbfile.sqlite')
 
     # Create a Crawler
     # Make it save the data about the first n pages of a given subreddit into our database
