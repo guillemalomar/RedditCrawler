@@ -20,9 +20,6 @@ class Database:
             except OSError as exc:  # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
-        if not os.path.isfile(db_file_name):
-            db_file = open(db_file_name, 'w')
-        else:
-            db_file = open(db_file_name, 'r')
+        db_file = open(db_file_name, 'w')
         db_file.close()
         return sqlite3.connect(db_file_name, check_same_thread=False)
