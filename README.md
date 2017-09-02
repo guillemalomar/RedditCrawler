@@ -35,6 +35,6 @@ This app will read data from a given subreddit, and obtain some statistics.
 
 ![alt text][logo]
 
-[logo]: https://github.com/guillemnicolau/RedditCrawler/blob/master/documentation/ApplicationArchitecture.png?raw=true "Logo Title Text 2"
+[logo]: https://raw.githubusercontent.com/guillemnicolau/RedditCrawler/master/documentation/ApplicationArchitecture.png "Application Architecture"
 
 ### Explanation
