@@ -22,6 +22,7 @@ This app will read data from a given subreddit, and obtain some statistics.
 - Python 2.7 (not tested on python3, at least the prints should be removed) 
 - lib xml (lxml): pip install lxml
 - Web.py: pip install web.py
+- Praw: pip install praw
 
 ## Using the application
 
