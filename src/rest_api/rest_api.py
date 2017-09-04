@@ -9,7 +9,8 @@
 import argparse
 # import errno
 # import os.path
-# import sqlite3
+import sqlite3
+import json
 
 import web
 from database.database import Database
@@ -47,13 +48,41 @@ class FetchSubreddit:
 class GetScoreRanking:
     # This method inserts a specified performer_name into the SQLite DB
     def GET(self):
-        pass
+        errors = []
+        result = []
+        cursor = db.cursor()
+        try:
+            cursor.execute('''SELECT submission_title, punctuation FROM submissions''')
+            pages = cursor.fetchall()
+        except sqlite3.OperationalError as e:
+            errors.append(str(e) + ". To load test data, run the application with option '--add-data")
+        if len(errors) == 0:
+            for page in pages:
+                result.append({'title': page[0],
+                               'score': page[1]})
+            return json.dumps({'result': result, 'code': 0})
+        else:
+            return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
 
 
 class GetDiscussionRanking:
     # This method inserts a specified song name and performer into the SQLite DB
     def GET(self):
-        pass
+        errors = []
+        result = []
+        cursor = db.cursor()
+        try:
+            cursor.execute('''SELECT submission_title, num_comments FROM submissions''')
+            pages = cursor.fetchall()
+        except sqlite3.OperationalError as e:
+            errors.append(str(e) + ". To load test data, run the application with option '--add-data")
+        if len(errors) == 0:
+            for page in pages:
+                result.append({'title': page[0],
+                               'num_comments': page[1]})
+            return json.dumps({'result': result, 'code': 0})
+        else:
+            return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
 
 
 class GetTopUsers:

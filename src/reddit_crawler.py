@@ -9,8 +9,9 @@
 import argparse
 import urllib
 import urllib2
-
+import json
 import dateutil.parser
+from data_processing.data_processing import ProcessData
 
 GET, POST = range(2)
 
@@ -22,8 +23,7 @@ def clean_screen():
 
 def message_output():
     # Print method for the first message
-    print "This is an application to That obtains the first n pages of a given subreddit,\n" \
-          "To quit the application, insert \"exit\""
+    print "This is an application that obtains statistics about the first n pages of a given subreddit"
 
 
 def decode_date(d):
@@ -36,10 +36,8 @@ def decode_date(d):
 
 def retrieve_data(subreddit, pages):
     """
-    For each play listed above, first add the necessary metadata: channels,
-    performers, songs, then the actual plays. Note that the metadata is posted
-    more than once: if the data already exists on the server, it shouldn't be
-    added again.
+    For each page in the first n pages of a given subreddit, store its data
+    in the RestAPI DB.
     """
     try:
         get_response("fetch_subreddit", {"chosen_subreddit": subreddit, "num_pages": pages}, method=POST)
@@ -47,16 +45,32 @@ def retrieve_data(subreddit, pages):
         print "e:", e
 
 
-def get_score_ranking():
+def get_score_ranking(my_processor):
+    """
+    Show the top10 of the pages, by points
+    """
+    print "---------- Top N pages by score ----------"
     try:
-        get_response("get_score_ranking", {}, method=GET)
+        res = json.loads(get_response("get_score_ranking", {}, method=GET))
+        for ind, entry in enumerate(my_processor.sort_by_score(res['result'])):
+            print "Top " + str(ind + 1) + ": " + " Score: " + str(entry[0]) + " Title: " + str(entry[1])
+            if ind + 1 == 10:
+                break
     except Exception as e:
         print "e:", e
 
 
 def get_discussion_ranking():
+    """
+    Show the top10 of the pages, by comments
+    """
+    print "---------- Top N pages by comments ----------"
     try:
-        get_response("get_discussion_ranking", {}, method=GET)
+        res = json.loads(get_response("get_discussion_ranking", {}, method=GET))
+        for ind, entry in enumerate(my_processor.sort_by_comments(res['result'])):
+            print "Top " + str(ind + 1) + ": " + " Comments: " + str(entry[0]) + " Title: " + str(entry[1])
+            if ind + 1 == 10:
+                break
     except Exception as e:
         print "e:", e
 
@@ -105,7 +119,7 @@ if __name__ == "__main__":
     parser.add_argument('--specify-subreddit', action="store", dest="subreddit",
                         help="Specify the subreddit from where to fetch", default='Python')
     parser.add_argument('--specify-pages', action="store", dest="pages",
-                        help="Specify the num of pages to fetch", default=10)
+                        help="Specify the num of pages to fetch", default=20)
 
     args = parser.parse_args()
     hostname = args.hostname
@@ -116,11 +130,11 @@ if __name__ == "__main__":
     if args.add_data:
         # Connect to the crawler through the RestAPI and make it store the subreddit data into the DB
         retrieve_data(chosen_subreddit, num_pages)
-        print "All data retrieved."
 
+    my_processor = ProcessData()
     # GOALS
     # Connect to the RestAPI in order to obtain some statistics from the DB stored data
-    get_score_ranking()
+    get_score_ranking(my_processor)
     get_discussion_ranking()
 
     # BONUS
