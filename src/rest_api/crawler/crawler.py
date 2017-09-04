@@ -12,7 +12,7 @@ import unidecode
 class Crawler:
     def __init__(self, db):
         self.db = db
-        self.reddit = praw.Reddit('bot1')
+        self.reddit = praw.Reddit('my_reddit_crawler')
 
     def retrieve_information(self, subreddit, hot_limit):
         # This method the first n pages (defined by 'hot_limit' parameter) from a
@@ -78,16 +78,26 @@ class Crawler:
 
     def retrieve_user_posts(self, chosen_username):
         user = self.reddit.get_redditor(chosen_username)
-        posts = user.get_submitted(limit=10)
+        posts = user.get_submitted(limit=100)
         user_posts = []
         for post in posts:
-            user_posts.append({'title': str(post.title), 'subreddit': str(post.subreddit.title)})
+            user_posts.append({'title': str(unidecode.unidecode(post.title)), 'subreddit': str(unidecode.unidecode(post.subreddit.title))})
         return user_posts
 
     def retrieve_user_comments(self, chosen_username):
         user = self.reddit.get_redditor(chosen_username)
-        comments = user.get_comments(limit=10)
+        comments = user.get_comments(limit=100)
         user_comments = []
         for comment in comments:
-            user_comments.append({'comment': str(comment.body), 'subreddit': str(comment.subreddit.title)})
+            user_comments.append({'comment': str(unidecode.unidecode(comment.body)), 'subreddit': str(unidecode.unidecode(comment.subreddit.title))})
+        return user_comments
+
+    def retrieve_user_avg_karma(self, chosen_username):
+        user = self.reddit.get_redditor(chosen_username)
+        gen = user.get_comments(limit=100)
+        user_comments = []
+        user_karma = 0
+        for ind, thing in enumerate(gen):
+            user_karma += thing.score
+        user_comments.append({'user': chosen_username, 'avg_karma': float(user_karma)/ind+1})
         return user_comments

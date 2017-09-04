@@ -109,9 +109,20 @@ class Crawler:
             user_comments.append({'comment': thing.body, 'subreddit': thing.subreddit.title})
         return user_comments
 
+    def retrieve_user_avg_karma(self, chosen_username):
+        user = self.reddit.get_redditor(chosen_username)
+        gen = user.get_comments(limit=10)
+        user_comments = []
+        user_karma = 0
+        for ind, thing in enumerate(gen):
+            user_karma += thing.score
+        user_comments.append({'user': chosen_username, 'avg_karma': float(user_karma)/ind+1})
+        return user_comments
+
 my_db = Database.initialize_db('test/testdbfile.sqlite')
 my_crawler = Crawler(my_db)
-# my_crawler.retrieve_information('Python', 10)
+my_crawler.retrieve_information('Python', 100)
 # my_crawler.retrieve_comments('Python')
 # my_crawler.retrieve_user_posts('guillemnicolau')
-my_crawler.retrieve_user_comments('guillemnicolau')
+# my_crawler.retrieve_user_comments('guillemnicolau')
+# my_crawler.retrieve_user_avg_karma('guillemnicolau')

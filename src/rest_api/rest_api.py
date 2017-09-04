@@ -72,14 +72,15 @@ class GetScoreRanking:
         result = []
         cursor = db.cursor()
         try:
-            cursor.execute('''SELECT submission_title, punctuation FROM submissions''')
+            cursor.execute('''SELECT submission_title, punctuation, discussion_url FROM submissions''')
             pages = cursor.fetchall()
         except sqlite3.OperationalError as e:
             errors.append(str(e) + ". To load test data, run the application with option '--add-data")
         if len(errors) == 0:
             for page in pages:
                 result.append({'title': page[0],
-                               'score': page[1]})
+                               'score': page[1],
+                               'url': page[2]})
             return json.dumps({'result': result, 'code': 0})
         else:
             return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
@@ -93,14 +94,15 @@ class GetDiscussionRanking:
         result = []
         cursor = db.cursor()
         try:
-            cursor.execute('''SELECT submission_title, num_comments FROM submissions''')
+            cursor.execute('''SELECT submission_title, num_comments, discussion_url FROM submissions''')
             pages = cursor.fetchall()
         except sqlite3.OperationalError as e:
             errors.append(str(e) + ". To load test data, run the application with option '--add-data")
         if len(errors) == 0:
             for page in pages:
                 result.append({'title': page[0],
-                               'num_comments': page[1]})
+                               'num_comments': page[1],
+                               'url': page[2]})
             return json.dumps({'result': result, 'code': 0})
         else:
             return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
@@ -214,7 +216,20 @@ class GetKarmaStats:
     # reproduced during a specified period of time.
     def GET(self):
         logging.debug('GetKarmaStats method called')
-        pass
+        errors = []
+        try:
+            chosen_username = web.input().chosen_username
+        except Exception as e:
+            errors.append(str(e) + ". Not all parameters where given, or their format is incorrect.")
+        # Create a Crawler
+        my_crawler = Crawler(db)
+        # Make it search for the top users in the subreddit, ordered by comments score
+        result = my_crawler.retrieve_user_avg_karma(chosen_username)
+        del my_crawler
+        if len(errors) == 0:
+            return json.dumps({'result': result, 'code': 0})
+        else:
+            return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
 
 
 if __name__ == "__main__":
