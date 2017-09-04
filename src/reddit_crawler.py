@@ -9,12 +9,14 @@
 import argparse
 import urllib
 import urllib2
+import logging
 import json
 import dateutil.parser
 from data_processing.data_processing import ProcessData
 
 GET, POST = range(2)
 
+logging.basicConfig(filename='reddit_crawler.log', level=logging.DEBUG)
 
 def clean_screen():
     # Method called to do a 'clear', just for application visualization purposes
@@ -39,6 +41,9 @@ def retrieve_data(subreddit, pages):
     For each page in the first n pages of a given subreddit, store its data
     in the RestAPI DB.
     """
+    logging.debug('retrieve_data method called with parameters:' +
+                  str(subreddit) + ", " +
+                  str(pages))
     try:
         get_response("fetch_subreddit", {"chosen_subreddit": subreddit, "num_pages": pages}, method=POST)
     except Exception as e:
@@ -49,6 +54,8 @@ def get_score_ranking(my_processor):
     """
     Show the top10 of the pages, by points
     """
+    logging.debug('get_score_ranking method called with parameters:' +
+                  str(my_processor))
     print "---------- Top N pages by score ----------"
     try:
         res = json.loads(get_response("get_score_ranking", {}, method=GET))
@@ -60,10 +67,12 @@ def get_score_ranking(my_processor):
         print "e:", e
 
 
-def get_discussion_ranking():
+def get_discussion_ranking(my_processor):
     """
     Show the top10 of the pages, by comments
     """
+    logging.debug('get_discussion_ranking method called with parameters:' +
+                  str(my_processor))
     print "---------- Top N pages by comments ----------"
     try:
         res = json.loads(get_response("get_discussion_ranking", {}, method=GET))
@@ -135,7 +144,7 @@ if __name__ == "__main__":
     # GOALS
     # Connect to the RestAPI in order to obtain some statistics from the DB stored data
     get_score_ranking(my_processor)
-    get_discussion_ranking()
+    get_discussion_ranking(my_processor)
 
     # BONUS
     get_top_users()
