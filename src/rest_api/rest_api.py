@@ -11,16 +11,21 @@ import argparse
 # import os.path
 import sqlite3
 import json
-
+import logging
 import web
 from database.database import Database
 from crawler.crawler import Crawler
+
+logging.basicConfig(filename='rest_api.log', level=logging.DEBUG)
 
 
 class MyApplication(web.application):
     # This method initializes the web server on a specified hostname and port,
     # and through a web server gateway interface
     def run(self, app_hostname, app_port, *middleware):
+        logging.debug('Rest API started with parameters:' +
+                      str(app_hostname) + ", " +
+                      str(app_port))
         func = self.wsgifunc(*middleware)
         return web.httpserver.runsimple(func, (app_hostname, app_port))
 
@@ -39,6 +44,9 @@ db = Database.initialize_db('database/data/dbfile.sqlite')
 class FetchSubreddit:
     # This method inserts a specified channel_name into the SQLite DB
     def POST(self):
+        logging.debug('FetchSubreddit method called with parameters:' +
+                      str(web.input().chosen_subreddit) + ", " +
+                      str(web.input().num_pages))
         # Create a Crawler
         my_crawler = Crawler(db)
         # Make it save the data about the first n pages of a given subreddit into our database
@@ -48,6 +56,7 @@ class FetchSubreddit:
 class GetScoreRanking:
     # This method inserts a specified performer_name into the SQLite DB
     def GET(self):
+        logging.debug('GetScoreRanking method called')
         errors = []
         result = []
         cursor = db.cursor()
@@ -68,6 +77,7 @@ class GetScoreRanking:
 class GetDiscussionRanking:
     # This method inserts a specified song name and performer into the SQLite DB
     def GET(self):
+        logging.debug('GetDiscussionRanking method called')
         errors = []
         result = []
         cursor = db.cursor()
@@ -88,6 +98,7 @@ class GetDiscussionRanking:
 class GetTopUsers:
     # This method inserts a specified play into the SQLite DB
     def GET(self):
+        logging.debug('GetTopUsers method called')
         pass
 
 
@@ -95,6 +106,7 @@ class GetKarmaStats:
     # This method retrieves all songs from a specified channel that were
     # reproduced during a specified period of time.
     def GET(self):
+        logging.debug('GetKarmaStats method called')
         pass
 
 
