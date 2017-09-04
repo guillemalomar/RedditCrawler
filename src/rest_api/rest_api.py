@@ -15,7 +15,6 @@ import logging
 import web
 from database.database import Database
 from crawler.crawler import Crawler
-import praw
 
 logging.basicConfig(filename='rest_api.log', level=logging.DEBUG)
 
@@ -38,6 +37,8 @@ urls = (
     '/get_top_users_by_submissions_score', 'GetTopUsersSubmissionsScore',
     '/get_top_users_by_submissions', 'GetTopUsersSubmissionsNum',
     '/get_top_users_by_comments_score', 'GetTopUsersCommentsScore',
+    '/get_posts_by_user', 'GetPostsByUser',
+    '/get_comments_by_user', 'GetCommentsByUser',
     '/get_karma_stats', 'GetKarmaStats'
 )
 
@@ -60,6 +61,7 @@ class FetchSubreddit:
         my_crawler = Crawler(db)
         # Make it save the data about the first n pages of a given subreddit into our database
         my_crawler.retrieve_information(subreddit, num_pages)
+        del my_crawler
 
 
 class GetScoreRanking:
@@ -160,10 +162,52 @@ class GetTopUsersCommentsScore:
         my_crawler = Crawler(db)
         # Make it search for the top users in the subreddit, ordered by comments score
         result = my_crawler.retrieve_total_user_comments_score(chosen_subreddit)
+        del my_crawler
         if len(errors) == 0:
             return json.dumps({'result': result, 'code': 0})
         else:
             return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
+
+
+class GetPostsByUser:
+    # This method inserts a specified play into the SQLite DB
+    def GET(self):
+        logging.debug('GetPostsByUser method called')
+        errors = []
+        try:
+            chosen_username = web.input().chosen_username
+        except Exception as e:
+            errors.append(str(e) + ". Not all parameters where given, or their format is incorrect.")
+        # Create a Crawler
+        my_crawler = Crawler(db)
+        # Make it search for the top users in the subreddit, ordered by comments score
+        result = my_crawler.retrieve_user_posts(chosen_username)
+        del my_crawler
+        if len(errors) == 0:
+            return json.dumps({'result': result, 'code': 0})
+        else:
+            return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
+
+
+class GetCommentsByUser:
+    # This method inserts a specified play into the SQLite DB
+    def GET(self):
+        logging.debug('GetCommentsByUser method called')
+        errors = []
+        try:
+            chosen_username = web.input().chosen_username
+        except Exception as e:
+            errors.append(str(e) + ". Not all parameters where given, or their format is incorrect.")
+        # Create a Crawler
+        my_crawler = Crawler(db)
+        # Make it search for the top users in the subreddit, ordered by comments score
+        result = my_crawler.retrieve_user_comments(chosen_username)
+        del my_crawler
+        if len(errors) == 0:
+            return json.dumps({'result': result, 'code': 0})
+        else:
+            return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
+
 
 class GetKarmaStats:
     # This method retrieves all songs from a specified channel that were
