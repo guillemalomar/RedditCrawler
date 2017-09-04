@@ -1,5 +1,13 @@
+#!/usr/bin/env python
+################################################
+#    Title: Reddit Crawler                     #
+#    Author: Guillem Nicolau Alomar Sitjes     #
+#    Date: September 1st, 2017                 #
+#    Code version: 0.1                         #
+#    Availability: Public                      #
+################################################
 import praw
-
+import unidecode
 
 class Crawler:
     def __init__(self, db):
@@ -16,7 +24,7 @@ class Crawler:
             print "Error when trying to obtain subreddit information:", e
             raise RuntimeError
 
-        cursor = self.db.connection.cursor()
+        cursor = self.db.cursor()
 
         cursor.execute("""
                 CREATE TABLE IF NOT EXISTS submissions(submission_title TEXT PRIMARY KEY,
@@ -24,13 +32,12 @@ class Crawler:
                                                        discussion_url TEXT,
                                                        submitter TEXT,
                                                        punctuation INTEGER,
-                                                       creation_date TEXT,
+                                                       creation_date FLOAT,
                                                        num_comments INTEGER)
                 """)
+        self.db.commit()
 
-        self.db.connection.commit()
-
-        for submission in subreddit.get_hot(limit=hot_limit):
+        for submission in subreddit.get_hot(limit=int(hot_limit)):
             cursor.execute('''INSERT OR REPLACE INTO submissions(submission_title,
                                                       external_url,
                                                       discussion_url,
@@ -38,11 +45,11 @@ class Crawler:
                                                       punctuation,
                                                       creation_date,
                                                       num_comments)
-                              VALUES(?,?,?,?,?,?,?)''', (str(submission.title),
-                                                         str(submission.permalink),
-                                                         str(submission.url),
+                              VALUES(?,?,?,?,?,?,?)''', (str(unidecode.unidecode(submission.title)),
+                                                         str(unidecode.unidecode(submission.permalink)),
+                                                         str(unidecode.unidecode(submission.url)),
                                                          str(submission.author),
-                                                         int(submission.score),
-                                                         str(submission.created),
-                                                         int(submission.comments.__len__())))
-            self.db.connection.commit()
+                                                         submission.score,
+                                                         submission.created,
+                                                         submission.comments.__len__()))
+            self.db.commit()

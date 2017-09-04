@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+################################################
+#    Title: Reddit Crawler                     #
+#    Author: Guillem Nicolau Alomar Sitjes     #
+#    Date: September 1st, 2017                 #
+#    Code version: 0.1                         #
+#    Availability: Public                      #
+################################################
 import sqlite3
 import errno
 import os.path

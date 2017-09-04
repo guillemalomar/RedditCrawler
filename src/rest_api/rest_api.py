@@ -1,20 +1,18 @@
 #!/usr/bin/env python
-'''
-/***********************************************
-*    Title: Songs Platform                     *
-*    Author: Guillem Nicolau Alomar Sitjes     *
-*    Date: July 23rd, 2017                     *
-*    Code version: 0.1                         *
-*    Availability: Public                      *
-***********************************************/
-'''
+################################################
+#    Title: Reddit Crawler                     #
+#    Author: Guillem Nicolau Alomar Sitjes     #
+#    Date: September 1st, 2017                 #
+#    Code version: 0.1                         #
+#    Availability: Public                      #
+################################################
 import argparse
-import errno
-import os.path
-import sqlite3
+# import errno
+# import os.path
+# import sqlite3
 
 import web
-
+from database.database import Database
 from crawler.crawler import Crawler
 
 
@@ -25,25 +23,6 @@ class MyApplication(web.application):
         func = self.wsgifunc(*middleware)
         return web.httpserver.runsimple(func, (app_hostname, app_port))
 
-
-def initialize_db(db_file_name, initialize_data=False):
-    # This method checks if the file exists, and if not, tries to create the
-    # folder containing it, and a blank file in that path. After that, returns
-    # a SQLite database instance linked to that file. 'check_same_thread
-    # parameter needs to be set to False to avoid problems between petitions.
-    if not os.path.exists(os.path.dirname(db_file_name)):
-        try:
-            os.makedirs(os.path.dirname(db_file_name))
-        except OSError as exc:  # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
-    if not os.path.isfile(db_file_name) or initialize_data:
-        db_file = open(db_file_name, 'w')
-    else:
-        db_file = open(db_file_name, 'r')
-    db_file.close()
-    return sqlite3.connect(db_file_name, check_same_thread=False)
-
 # Links between urls and classes
 urls = (
     '/fetch_subreddit', 'FetchSubreddit',
@@ -53,7 +32,7 @@ urls = (
     '/get_karma_stats', 'GetKarmaStats'
 )
 
-db = initialize_db('database/data/dbfile.sqlite')
+db = Database.initialize_db('database/data/dbfile.sqlite')
 
 
 class FetchSubreddit:
@@ -88,7 +67,6 @@ class GetKarmaStats:
     # reproduced during a specified period of time.
     def GET(self):
         pass
-
 
 
 if __name__ == "__main__":
