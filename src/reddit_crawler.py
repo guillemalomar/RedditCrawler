@@ -52,11 +52,11 @@ def retrieve_data(subreddit, pages):
 
 def get_score_ranking(my_processor):
     """
-    Show the top10 of the pages, by points
+    Show the top10 pages, by points
     """
     logging.debug('get_score_ranking method called with parameters:' +
                   str(my_processor))
-    print "---------- Top N pages by score ----------"
+    print "---------- Top 10 pages by score ----------"
     try:
         res = json.loads(get_response("get_score_ranking", {}, method=GET))
         for ind, entry in enumerate(my_processor.sort_by_score(res['result'])):
@@ -69,11 +69,11 @@ def get_score_ranking(my_processor):
 
 def get_discussion_ranking(my_processor):
     """
-    Show the top10 of the pages, by comments
+    Show the top10 pages, by comments
     """
     logging.debug('get_discussion_ranking method called with parameters:' +
                   str(my_processor))
-    print "---------- Top N pages by comments ----------"
+    print "---------- Top 10 pages by comments ----------"
     try:
         res = json.loads(get_response("get_discussion_ranking", {}, method=GET))
         for ind, entry in enumerate(my_processor.sort_by_comments(res['result'])):
@@ -84,9 +84,53 @@ def get_discussion_ranking(my_processor):
         print "e:", e
 
 
-def get_top_users():
+def get_top_users_by_submissions_score(subreddit, my_processor):
+    """
+    Show the top10 users, by submission score
+    """
+    logging.debug('get_discussion_ranking method called with parameters:' +
+                  str(my_processor))
+    print "---------- Top 10 submitters by submissions score ----------"
     try:
-        get_response("get_top_users", {}, method=GET)
+        res = json.loads(get_response("get_top_users_by_submissions_score", {"chosen_subreddit": subreddit}, method=GET))
+        for ind, entry in enumerate(my_processor.sort_authors_by_submission_score(res['result'])):
+            print "Top " + str(ind + 1) + ": " + " Submissions score: " + str(entry[0]) + " Author: " + str(entry[1])
+            if ind + 1 == 10:
+                break
+    except Exception as e:
+        print "e:", e
+
+
+def get_top_users_by_submissions(subreddit, my_processor):
+    """
+    Show the top10 users, by number of submissions
+    """
+    logging.debug('get_discussion_ranking method called with parameters:' +
+                  str(my_processor))
+    print "---------- Top 10 submitters by submissions ----------"
+    try:
+        res = json.loads(get_response("get_top_users_by_submissions", {"chosen_subreddit": subreddit}, method=GET))
+        for ind, entry in enumerate(my_processor.sort_authors_by_submissions(res['result'])):
+            print "Top " + str(ind + 1) + ": " + " Submissions: " + str(entry[0]) + " Author: " + str(entry[1])
+            if ind + 1 == 10:
+                break
+    except Exception as e:
+        print "e:", e
+
+
+def get_top_users_by_score(subreddit, my_processor):
+    """
+    Show the top10 users, by comments score
+    """
+    logging.debug('get_discussion_ranking method called with parameters:' +
+                  str(my_processor))
+    print "---------- Top 10 commenters by score ----------"
+    try:
+        res = json.loads(get_response("get_top_users_by_comments_score", {"chosen_subreddit": subreddit}, method=GET))
+        for ind, entry in enumerate(my_processor.sort_authors_by_score(res['result'])):
+            print "Top " + str(ind + 1) + ": " + " Score: " + str(entry[0]) + " Author: " + str(entry[1])
+            if ind + 1 == 10:
+                break
     except Exception as e:
         print "e:", e
 
@@ -140,12 +184,14 @@ if __name__ == "__main__":
         # Connect to the crawler through the RestAPI and make it store the subreddit data into the DB
         retrieve_data(chosen_subreddit, num_pages)
 
-    my_processor = ProcessData()
+    processor = ProcessData()
     # GOALS
     # Connect to the RestAPI in order to obtain some statistics from the DB stored data
-    get_score_ranking(my_processor)
-    get_discussion_ranking(my_processor)
+    get_score_ranking(processor)
+    get_discussion_ranking(processor)
 
     # BONUS
-    get_top_users()
+    get_top_users_by_submissions_score(chosen_subreddit, processor)
+    get_top_users_by_submissions(chosen_subreddit, processor)
+    get_top_users_by_score(chosen_subreddit, processor)
     get_karma_stats()

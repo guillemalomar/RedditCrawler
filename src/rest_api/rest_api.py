@@ -15,6 +15,7 @@ import logging
 import web
 from database.database import Database
 from crawler.crawler import Crawler
+import praw
 
 logging.basicConfig(filename='rest_api.log', level=logging.DEBUG)
 
@@ -34,7 +35,9 @@ urls = (
     '/fetch_subreddit', 'FetchSubreddit',
     '/get_score_ranking', 'GetScoreRanking',
     '/get_discussion_ranking', 'GetDiscussionRanking',
-    '/get_top_users', 'GetTopUsers',
+    '/get_top_users_by_submissions_score', 'GetTopUsersSubmissionsScore',
+    '/get_top_users_by_submissions', 'GetTopUsersSubmissionsNum',
+    '/get_top_users_by_comments_score', 'GetTopUsersCommentsScore',
     '/get_karma_stats', 'GetKarmaStats'
 )
 
@@ -47,10 +50,16 @@ class FetchSubreddit:
         logging.debug('FetchSubreddit method called with parameters:' +
                       str(web.input().chosen_subreddit) + ", " +
                       str(web.input().num_pages))
+        errors = []
+        try:
+            subreddit = web.input().chosen_subreddit
+            num_pages = web.input().num_pages
+        except Exception as e:
+            errors.append(str(e) + ". Not all parameters where given, or their format is incorrect.")
         # Create a Crawler
         my_crawler = Crawler(db)
         # Make it save the data about the first n pages of a given subreddit into our database
-        my_crawler.retrieve_information(web.input().chosen_subreddit, web.input().num_pages)
+        my_crawler.retrieve_information(subreddit, num_pages)
 
 
 class GetScoreRanking:
@@ -95,12 +104,66 @@ class GetDiscussionRanking:
             return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
 
 
-class GetTopUsers:
+class GetTopUsersSubmissionsScore:
     # This method inserts a specified play into the SQLite DB
     def GET(self):
-        logging.debug('GetTopUsers method called')
-        pass
+        logging.debug('GetTopUsersSubmissionsScore method called')
+        errors = []
+        result = []
+        cursor = db.cursor()
+        try:
+            cursor.execute('''SELECT submitter, punctuation, submission_title FROM submissions''')
+            pages = cursor.fetchall()
+        except sqlite3.OperationalError as e:
+            errors.append(str(e) + ". To load test data, run the application with option '--add-data")
+        if len(errors) == 0:
+            for page in pages:
+                result.append({'submitter': page[0],
+                               'punctuation': page[1],
+                               'submission_title': page[2]})
+            return json.dumps({'result': result, 'code': 0})
+        else:
+            return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
 
+
+class GetTopUsersSubmissionsNum:
+    # This method inserts a specified play into the SQLite DB
+    def GET(self):
+        logging.debug('GetTopUsersSubmissionsNum method called')
+        errors = []
+        result = []
+        cursor = db.cursor()
+        try:
+            cursor.execute('''SELECT submitter, submission_title FROM submissions''')
+            pages = cursor.fetchall()
+        except sqlite3.OperationalError as e:
+            errors.append(str(e) + ". To load test data, run the application with option '--add-data")
+        if len(errors) == 0:
+            for page in pages:
+                result.append({'submitter': page[0],
+                               'submission_title': page[1]})
+            return json.dumps({'result': result, 'code': 0})
+        else:
+            return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
+
+
+class GetTopUsersCommentsScore:
+    # This method inserts a specified play into the SQLite DB
+    def GET(self):
+        logging.debug('GetTopUsersCommentsScore method called')
+        errors = []
+        try:
+            chosen_subreddit = web.input().chosen_subreddit
+        except Exception as e:
+            errors.append(str(e) + ". Not all parameters where given, or their format is incorrect.")
+        # Create a Crawler
+        my_crawler = Crawler(db)
+        # Make it search for the top users in the subreddit, ordered by comments score
+        result = my_crawler.retrieve_total_user_comments_score(chosen_subreddit)
+        if len(errors) == 0:
+            return json.dumps({'result': result, 'code': 0})
+        else:
+            return json.dumps({'result': result, 'code': len(errors), 'errors': list(errors)})
 
 class GetKarmaStats:
     # This method retrieves all songs from a specified channel that were
