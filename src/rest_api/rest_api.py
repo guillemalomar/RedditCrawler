@@ -16,18 +16,24 @@ import web
 from database.database import Database
 from crawler.crawler import Crawler
 
-logging.basicConfig(filename='rest_api.log', level=logging.DEBUG)
+logging.basicConfig(filename='logs/rest_api.log', level=logging.DEBUG)
 
 
 class MyApplication(web.application):
-    # This method initializes the web server on a specified hostname and port,
-    # and through a web server gateway interface
-    def run(self, app_hostname, app_port, *middleware):
+    def run(self, server_hostname, server_port, *middleware):
+        """
+        This method initializes the web server on a specified hostname and port,
+        and through a web server gateway interface
+        :param server_hostname: hostname where the server will be located
+        :param server_port: port that the server will use
+        :param middleware: .
+        :return: server running
+        """
         logging.debug('Rest API started with parameters:' +
-                      str(app_hostname) + ", " +
-                      str(app_port))
+                      str(server_hostname) + ", " +
+                      str(server_port))
         func = self.wsgifunc(*middleware)
-        return web.httpserver.runsimple(func, (app_hostname, app_port))
+        return web.httpserver.runsimple(func, (server_hostname, server_port))
 
 # Links between urls and classes
 urls = (
@@ -42,13 +48,18 @@ urls = (
     '/get_karma_stats', 'GetKarmaStats'
 )
 
-db = Database.initialize_db('database/data/dbfile.sqlite')
+db = Database.initialize_db('src/rest_api/database/data/dbfile.sqlite')
 
 
 class FetchSubreddit:
-    # This method inserts a specified channel_name into the SQLite DB
     def POST(self):
-        db = Database.initialize_db('database/data/dbfile.sqlite')
+        """
+        This method fetches the needed information from Reddit.com in order to
+        run modes 1 (GetScoreRanking) and 2 (GetDiscussionRanking)
+        and persists it into the SQLite DB
+        :return:
+        """
+        db = Database.initialize_db('src/rest_api/database/data/dbfile.sqlite')
         logging.debug('FetchSubreddit method called with parameters:' +
                       str(web.input().chosen_subreddit) + ", " +
                       str(web.input().num_pages))
@@ -66,8 +77,12 @@ class FetchSubreddit:
 
 
 class GetScoreRanking:
-    # This method inserts a specified performer_name into the SQLite DB
     def GET(self):
+        """
+        This method fetches the information needed to create the score
+        ranking from the SQLite DB and returns it to the main application.
+        :return: data needed to create the Score Ranking
+        """
         logging.debug('GetScoreRanking method called')
         errors = []
         result = []
@@ -88,8 +103,12 @@ class GetScoreRanking:
 
 
 class GetDiscussionRanking:
-    # This method inserts a specified song name and performer into the SQLite DB
     def GET(self):
+        """
+        This method fetches the information needed to create the discussion
+        ranking from the SQLite DB and returns it to the main application.
+        :return: data needed to create the Discussion Ranking
+        """
         logging.debug('GetDiscussionRanking method called')
         errors = []
         result = []
@@ -110,8 +129,13 @@ class GetDiscussionRanking:
 
 
 class GetTopUsersSubmissionsScore:
-    # This method inserts a specified play into the SQLite DB
     def GET(self):
+        """
+        This method fetches the information needed to create the ranking of
+        top users by submission score from the SQLite DB and returns it to
+        the main application.
+        :return: data needed to create the Ranking of top users by submission score
+        """
         logging.debug('GetTopUsersSubmissionsScore method called')
         errors = []
         result = []
@@ -132,8 +156,13 @@ class GetTopUsersSubmissionsScore:
 
 
 class GetTopUsersSubmissionsNum:
-    # This method inserts a specified play into the SQLite DB
     def GET(self):
+        """
+        This method fetches the information needed to create the ranking of
+        top users by submissions from the SQLite DB and returns it to
+        the main application.
+        :return: data needed to create the Ranking of top users by submissions
+        """
         logging.debug('GetTopUsersSubmissionsNum method called')
         errors = []
         result = []
@@ -153,8 +182,13 @@ class GetTopUsersSubmissionsNum:
 
 
 class GetTopUsersCommentsScore:
-    # This method inserts a specified play into the SQLite DB
     def GET(self):
+        """
+        This method fetches the information needed to create the ranking of
+        top users by submissions from Reddit.com and returns it to the main
+        application.
+        :return: data needed to create the Ranking of top users by comments score
+        """
         logging.debug('GetTopUsersCommentsScore method called')
         errors = []
         try:
@@ -173,8 +207,13 @@ class GetTopUsersCommentsScore:
 
 
 class GetPostsByUser:
-    # This method inserts a specified play into the SQLite DB
     def GET(self):
+        """
+        This method fetches the information needed to create the list
+        of submissions by user from Reddit.com and returns it to the main
+        application.
+        :return: data needed to create the list of submissions by user
+        """
         logging.debug('GetPostsByUser method called')
         errors = []
         try:
@@ -193,8 +232,13 @@ class GetPostsByUser:
 
 
 class GetCommentsByUser:
-    # This method inserts a specified play into the SQLite DB
     def GET(self):
+        """
+        This method fetches the information needed to create the list
+        of comments by user from Reddit.com and returns it to the main
+        application.
+        :return: data needed to create the list of comments by user
+        """
         logging.debug('GetCommentsByUser method called')
         errors = []
         try:
@@ -213,9 +257,13 @@ class GetCommentsByUser:
 
 
 class GetKarmaStats:
-    # This method retrieves all songs from a specified channel that were
-    # reproduced during a specified period of time.
     def GET(self):
+        """
+        This method fetches the information needed to create the statistic
+        of average comment karma by user from Reddit.com and returns it to the main
+        application.
+        :return: data needed to calculate the average comment karma by user
+        """
         logging.debug('GetKarmaStats method called')
         errors = []
         try:
