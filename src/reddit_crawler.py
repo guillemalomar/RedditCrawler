@@ -9,6 +9,7 @@
 import argparse
 import os
 import reddit_crawler_modes
+import sys
 
 GET, POST = range(2)
 
@@ -89,20 +90,20 @@ def check_input(input_var):
 # Main method
 if __name__ == "__main__":
     clean_screen()
-    message_header()
-    message_output()
 
-    parser = argparse.ArgumentParser(description='Web Crawler')
-    parser.add_argument('-H', action="store", dest="hostname",
+    parser = argparse.ArgumentParser(description='Reddit Crawler Client', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--hostname', action="store", dest="hostname",
+                        help="Hostname to connect to the server",
                         default="localhost", type=str)
-    parser.add_argument('-P', action="store", dest="port",
+    parser.add_argument('--port', action="store", dest="port",
+                        help="Port to connect to the server",
                         default=8080, type=int)
-    parser.add_argument('--specify-subreddit', action="store", dest="subreddit",
-                        help="Specify the subreddit from where to fetch", default='Python')
-    parser.add_argument('--specify-pages', action="store", dest="pages",
-                        help="Specify the num of pages to fetch", default=100)
-    parser.add_argument('--specify-user', action="store", dest="username",
-                        help="Specify the name of the username to analyze", default='guillemnicolau')
+    parser.add_argument('--subreddit', action="store", dest="subreddit",
+                        help="Specify the subreddit from where to fetch", default='Python', type=str)
+    parser.add_argument('--pages', action="store", dest="pages",
+                        help="Specify the num of pages to fetch", default=100, type=int)
+    parser.add_argument('--user', action="store", dest="username",
+                        help="Specify the name of the username to analyze", default='guillemnicolau', type=str)
 
     args = parser.parse_args()
     hostname = args.hostname
@@ -110,6 +111,9 @@ if __name__ == "__main__":
     chosen_subreddit = args.subreddit
     num_pages = int(args.pages)
     chose_username = args.username
+
+    message_header()
+    message_output()
 
     while True:
         correct_input = False

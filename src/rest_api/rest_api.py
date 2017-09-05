@@ -235,13 +235,15 @@ class GetKarmaStats:
 
 if __name__ == "__main__":
     # Arguments are taken from command line
-    parser = argparse.ArgumentParser(description='Web Crawler')
-    parser.add_argument('-H', action="store", dest="hostname",
+    parser = argparse.ArgumentParser(description='Reddit Crawler Server', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--hostname', action="store", dest="hostname",
+                        help="Hostname of the server",
                         default="localhost", type=str)
-    parser.add_argument('-P', action="store", dest="port",
+    parser.add_argument('--port', action="store", dest="port",
+                        help="Port of the server",
                         default=8080, type=int)
-    args = parser.parse_args()
 
+    args = parser.parse_args()
     hostname = args.hostname
     port = args.port
 
