@@ -6,16 +6,15 @@
 *    Code version: 0.1                         
 *    Availability: Public     
 
-This app will read data from a given subreddit, and obtain some statistics.
-
 **Index**
 * [Requirements](#requirements)
-* [Using the application](#using-the-application)
-    * [Executing](#executing)
-    * [Testing](#testing)
 * [Documentation](#documentation)
     * [Project Structure](#project-structure)
     * [Explanation](#explanation)
+* [Using the application](#using-the-application)
+    * [Executing](#executing)
+    * [Testing](#testing)
+* [Decisions taken](#decisions-taken)
 
 ## Requirements
 
@@ -25,13 +24,11 @@ This app will read data from a given subreddit, and obtain some statistics.
 - Praw: pip install praw==3.6.0
 - Unidecode: pip install unidecode
 
-## Using the application
-
-### Executing
-
-### Testing
-
 ## Documentation
+
+### Explanation
+
+This project is all about obtaining data from Reddit, processing it, and showing it to the user. It presents a Client-Server architecture, featuring a RestAPI server, which is backed by a SQLite database.
 
 ### Project Structure
 
@@ -39,4 +36,25 @@ This app will read data from a given subreddit, and obtain some statistics.
 
 [logo]: https://raw.githubusercontent.com/guillemnicolau/RedditCrawler/master/documentation/ApplicationArchitecture.png "Application Architecture"
 
-### Explanation
+## Using the application
+
+### Executing
+- Running the server
+
+First of all, the user should start by running the server. This is done this way:
+```
+~/RedditCrawler$ python src/rest_api/rest_api.py
+```
+If this has worked correctly, this should be the output:`
+```
+http://localhost:8080/
+```
+- Executing the client application
+
+Now that the server is running, we can execute the application. This is done by typing this:
+```
+~/RedditCrawler$ python src/reddit_crawler.py
+```
+### Testing
+
+## Decisions taken
