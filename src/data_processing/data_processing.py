@@ -7,6 +7,7 @@
 #    Availability: Public                      #
 ################################################
 
+
 class ProcessData:
     def __init__(self):
         pass
@@ -40,7 +41,8 @@ class ProcessData:
         list_to_return = []
         gathered_dict = {}
         for list_dict in list_to_process:
-            gathered_dict[str(list_dict['submitter'])] = gathered_dict.get(str(list_dict['submitter']), 0) + list_dict['punctuation']
+            gathered_dict[str(list_dict['submitter'])] = gathered_dict.get(str(list_dict['submitter']), 0) + \
+                                                         list_dict['punctuation']
         for submitter, punctuation in gathered_dict.iteritems():
             list_to_return.append((punctuation, submitter))
         sorted_list = sorted(list_to_return, key=lambda x: x[0], reverse=True)
