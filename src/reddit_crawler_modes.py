@@ -41,7 +41,8 @@ def retrieve_data(subreddit, pages, hostname, port):
                      method=POST)
         print "Database updated"
     except Exception as e:
-        print "e:", e
+        print "Error in retrieve_data:", e
+        logging.error('retrieve_data error: ' + e)
     logging.debug('retrieve_data method total time:' + str(my_timer.finish()))
 
 _reddit_url = re.compile('.*https://www.reddit.com/r/+.*')
@@ -98,7 +99,8 @@ def get_score_ranking(hostname, port):
                 if ind + 1 == 10:
                     break
     except Exception as e:
-        print "e:", e
+        print "Error in get_score_ranking:", e
+        logging.error('get_score_ranking error: ' + e)
     logging.debug('get_score_ranking method total time:' + str(my_timer.finish()))
 
 
@@ -153,7 +155,8 @@ def get_discussion_ranking(hostname, port):
                 if ind + 1 == 10:
                     break
     except Exception as e:
-        print "e:", e
+        print "Error in get_discussion_ranking:", e
+        logging.error('get_discussion_ranking error: ' + e)
     logging.debug('get_discussion_ranking method total time:' + str(my_timer.finish()))
 
 
@@ -182,7 +185,8 @@ def get_top_users_by_submissions_score(subreddit, hostname, port):
                 if ind + 1 == 10:
                     break
     except Exception as e:
-        print "e:", e
+        print "Error in get_top_users_by_submissions_score:", e
+        logging.error('get_top_users_by_submissions_score error: ' + e)
     logging.debug('get_top_users_by_submissions_score method total time:' + str(my_timer.finish()))
 
 
@@ -211,7 +215,8 @@ def get_top_users_by_submissions(subreddit, hostname, port):
                 if ind + 1 == 10:
                     break
     except Exception as e:
-        print "e:", e
+        print "Error in get_top_users_by_submissions:", e
+        logging.error('get_top_users_by_submissions error: ' + e)
     logging.debug('get_top_users_by_submissions method total time:' + str(my_timer.finish()))
 
 
@@ -237,7 +242,8 @@ def get_top_users_by_score(subreddit, hostname, port):
             if ind + 1 == 10:
                 break
     except Exception as e:
-        print "e:", e
+        print "Error in get_top_users_by_score:", e
+        logging.error('get_top_users_by_score error: ' + e)
     logging.debug('get_top_users_by_score method total time:' + str(my_timer.finish()))
 
 
@@ -264,7 +270,8 @@ def get_posts_by_user(chosen_username, hostname, port):
             if ind + 1 == 10:
                 break
     except Exception as e:
-        print "e:", e
+        print "Error in get_posts_by_user:", e
+        logging.error('get_posts_by_user error: ' + e)
     logging.debug('get_posts_by_user method total time:' + str(my_timer.finish()))
 
 
@@ -293,7 +300,8 @@ def get_comments_by_user(chosen_username, hostname, port):
             if ind + 1 == 10:
                 break
     except Exception as e:
-        print "e:", e
+        print "Error in get_comments_by_user:", e
+        logging.error('get_comments_by_user error: ' + e)
     logging.debug('get_comments_by_user method total time:' + str(my_timer.finish()))
 
 
@@ -318,7 +326,8 @@ def get_karma_stats(chose_username, hostname, port):
             print "No results, database is probably empty"
         print "Average_karma: " + str(res['result'][0]['avg_karma'])
     except Exception as e:
-        print "e:", e
+        print "Error in get_karma_stats:", e
+        logging.error('get_karma_stats error: ' + e)
     logging.debug('get_karma_stats method total time:' + str(my_timer.finish()))
 
 
