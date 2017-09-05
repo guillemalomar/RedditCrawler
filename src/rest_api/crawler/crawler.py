@@ -9,6 +9,7 @@
 import praw
 import unidecode
 
+
 class Crawler:
     def __init__(self, db):
         self.db = db
@@ -81,7 +82,8 @@ class Crawler:
         posts = user.get_submitted(limit=100)
         user_posts = []
         for post in posts:
-            user_posts.append({'title': str(unidecode.unidecode(post.title)), 'subreddit': str(unidecode.unidecode(post.subreddit.title))})
+            user_posts.append({'title': str(unidecode.unidecode(post.title)),
+                               'subreddit': str(unidecode.unidecode(post.subreddit.title))})
         return user_posts
 
     def retrieve_user_comments(self, chosen_username):
@@ -89,7 +91,8 @@ class Crawler:
         comments = user.get_comments(limit=100)
         user_comments = []
         for comment in comments:
-            user_comments.append({'comment': str(unidecode.unidecode(comment.body)), 'subreddit': str(unidecode.unidecode(comment.subreddit.title))})
+            user_comments.append({'comment': str(unidecode.unidecode(comment.body)),
+                                  'subreddit': str(unidecode.unidecode(comment.subreddit.title))})
         return user_comments
 
     def retrieve_user_avg_karma(self, chosen_username):
@@ -97,7 +100,9 @@ class Crawler:
         gen = user.get_comments(limit=100)
         user_comments = []
         user_karma = 0
+        last_ind = 1
         for ind, thing in enumerate(gen):
             user_karma += thing.score
-        user_comments.append({'user': chosen_username, 'avg_karma': float(user_karma)/ind+1})
+            last_ind = ind
+        user_comments.append({'user': chosen_username, 'avg_karma': float(user_karma)/last_ind+1})
         return user_comments
