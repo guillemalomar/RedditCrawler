@@ -32,9 +32,18 @@ This project is all about obtaining data from Reddit, processing it, and showing
 
 ### Project Structure
 
+- Application Architecture
+
 ![alt text][logo]
 
 [logo]: https://raw.githubusercontent.com/guillemnicolau/RedditCrawler/master/documentation/ApplicationArchitecture.png "Application Architecture"
+
+- Files and Folders
+
+![alt text][logo2]
+
+[logo2]: https://github.com/guillemnicolau/RedditCrawler/blob/master/documentation/FoldersAndFiles.png?raw=true "Folders and Files"
+
 
 ## Using the application
 
