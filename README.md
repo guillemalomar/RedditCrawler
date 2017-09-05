@@ -58,3 +58,19 @@ Now that the server is running, we can execute the application. This is done by 
 ### Testing
 
 ## Decisions taken
+
+To do this project I followed some basic instructions, but the specific components and architecture had to be chosen by me.
+This wasn't the first time I implemented a RESTful API (see https://github.com/guillemnicolau/SongsPlatform), and neither that I used a SQL database.
+
+- Database
+
+When choosing the database I decided to use SQLite3 after pondering between the mentioned one and MongoDB (those seemed to be the most mentioned on the web for small-scale projects). After seeing this post in StackOverflow about their comparison (https://stackoverflow.com/questions/9702643/mysql-vs-mongodb-1000-reads) I thought that in this case all inserts would be done once in a while, maybe once every 6 hours (Subreddit top pages don't change really often, it's not like tweeter, so with that periodicity would be enough to have an ~updated database). After thinking about this, and seeing that SQLite is faster than MongoDB for selects when the number of tables is not over +100, I decided to use SQLite3.
+
+- Reddit library
+
+About the library to retrieve data from Reddit, I chose PRAW. This was quite an easy decision. There are not many alternatives, and after doing some research I knew it had all functionalities that I needed.
+Another possibility was to filter all data from the webpage myself, but after checking how it was structured, and knowing that I have close to no experience in web crawlers, for me it was clear that using PRAW was the best decision.
+
+- Application Architecture
+
+Another important decision was the location of the database. At first the architecture was quite different from the final one. The database was located independently from both the server and the client, and it could be accessed both from the server and the processing module. Although this probably would lead to a better performance, it was contrary to the philosophy of a RESTful API. So in the end I decided to only be able to access it through the server, as that's the logical way to design it. The crawlers module was also located in the client module at the beginning, but it makes more sense to be located in the server, as this way it can connect directly to the Subreddit webpage.
