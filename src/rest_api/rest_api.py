@@ -42,13 +42,13 @@ urls = (
     '/get_karma_stats', 'GetKarmaStats'
 )
 
-db = Database.initialize_db('database/data/dbfile.sqlite')
+db = Database.initialize_db('src/rest_api/database/data/dbfile.sqlite')
 
 
 class FetchSubreddit:
     # This method inserts a specified channel_name into the SQLite DB
     def POST(self):
-        db = Database.initialize_db('database/data/dbfile.sqlite')
+        db = Database.initialize_db('src/rest_api/database/data/dbfile.sqlite')
         logging.debug('FetchSubreddit method called with parameters:' +
                       str(web.input().chosen_subreddit) + ", " +
                       str(web.input().num_pages))

@@ -9,35 +9,33 @@
 import argparse
 import os
 import reddit_crawler_modes
-import sys
+from timer import Timer
 
 GET, POST = range(2)
 
 
 def clean_screen():
-    # Method called to do a 'clear', just for application visualization purposes
+    """
+    Method called to do a 'clear', just for application visualization purposes
+    :return:
+    """
     print(chr(27) + "[2J")
 
 
 def message_header():
-    # Print method for the header of the application
+    """
+    Print method for the header of the application
+    :return:
+    """
     print "******************************\n* Reddit Crawler Application *\n******************************"
     print "This is an application that obtains statistics of a given subreddit or reddit user"
 
 
-def message_output():
-    # Print method for the input modes
-    show_modes()
-    print " RETRIEVE - Fill database with subreddit data\n" + \
-          " REFRESH  - Update database with subreddit data\n" + \
-          " DELETE   - Delete all database data\n" + \
-          " HELP     - Show the initial application message\n" + \
-          " MODES    - Show the available modes\n" + \
-          " EXIT     - Quit application"
-
-
 def show_modes():
-    # Print method for the available modes
+    """
+    Print method for the available data processing modes
+    :return:
+    """
     print "Available modes:"
     print " 1 - Get Pages by Score Ranking\n" + \
           " 2 - Get Pages by Comment Ranking\n" + \
@@ -49,8 +47,26 @@ def show_modes():
           " 8 - Get Karma Stats from User"
 
 
+def message_output():
+    """
+    Print method for all the available modes
+    :return:
+    """
+    show_modes()
+    print " RETRIEVE - Fill database with subreddit data\n" + \
+          " REFRESH  - Update database with subreddit data\n" + \
+          " DELETE   - Delete all database data\n" + \
+          " HELP     - Show the initial application message\n" + \
+          " MODES    - Show the available modes\n" + \
+          " EXIT     - Quit application"
+
+
 def check_input(input_var):
-    # Method to check if the user wants to finish the application
+    """
+    Method to check if the selected method is correct, and to exit if wanted
+    :param input_var: user mode selected
+    :return: True (Mode to execute) / False (Mode executed or incorrect)
+    """
     if input_var.lower() == 'exit':
         print "The application will now end."
         clean_screen()
@@ -61,24 +77,10 @@ def check_input(input_var):
     elif input_var.lower() == 'help':
         message_output()
         return False
-    elif input_var.lower() == 'retrieve':
-        return True
-    elif input_var.lower() == 'delete':
-        try:
-            os.remove('src/rest_api/database/data/dbfile.sqlite')
-            print "Database data removed"
-        except Exception as e:
-            print "Error trying to remove Database data:", e
-        return False
-    elif input_var.lower() == 'refresh':
-        try:
-            os.remove('src/rest_api/database/data/dbfile.sqlite')
-            print "Database data removed"
-        except Exception as e:
-            print "Error trying to remove Database data:", e
+    elif input_var.lower() in ['retrieve', 'delete', 'refresh']:
         return True
     try:
-        if int(input_var) not in range(0, 10):
+        if int(input_var) not in range(0, 9):
             print "Please enter a valid mode."
             return False
     except:
@@ -121,21 +123,29 @@ if __name__ == "__main__":
             print "***************************"
             var = raw_input("Please, enter a new mode: ")
             correct_input = check_input(var)
-        if var.lower() == 'refresh' or var.lower() == 'retrieve':
+        my_timer = Timer()
+        if var.lower() == 'delete' or var.lower() == 'refresh':
+            try:
+                os.remove('src/rest_api/database/data/dbfile.sqlite')
+                print "Database data removed"
+            except OSError:
+                print "Error trying to remove Database data: File doesn't exist"
+        if var.lower() == 'retrieve' or var.lower() == 'refresh':
             reddit_crawler_modes.retrieve_data(chosen_subreddit, num_pages, hostname, port)
-        elif int(var) == 1:
+        elif var == '1':
             reddit_crawler_modes.get_score_ranking(hostname, port)
-        elif int(var) == 2:
+        elif var == '2':
             reddit_crawler_modes.get_discussion_ranking(hostname, port)
-        elif int(var) == 3:
+        elif var == '3':
             reddit_crawler_modes.get_top_users_by_submissions_score(chosen_subreddit, hostname, port)
-        elif int(var) == 4:
+        elif var == '4':
             reddit_crawler_modes.get_top_users_by_submissions(chosen_subreddit, hostname, port)
-        elif int(var) == 5:
+        elif var == '5':
             reddit_crawler_modes.get_top_users_by_score(chosen_subreddit, hostname, port)
-        elif int(var) == 6:
+        elif var == '6':
             reddit_crawler_modes.get_posts_by_user(chose_username, hostname, port)
-        elif int(var) == 7:
+        elif var == '7':
             reddit_crawler_modes.get_comments_by_user(chose_username, hostname, port)
-        elif int(var) == 8:
+        elif var == '8':
             reddit_crawler_modes.get_karma_stats(chose_username, hostname, port)
+        my_timer.finish()
