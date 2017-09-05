@@ -15,6 +15,7 @@ GET, POST = range(2)
 
 logging.basicConfig(filename='logs/rest_api.log', level=logging.DEBUG)
 
+
 def clean_screen():
     """
     Method called to do a 'clear', just for application visualization purposes
@@ -80,11 +81,7 @@ def check_input(input_var):
         return False
     elif input_var.lower() in ['retrieve', 'delete', 'refresh']:
         return True
-    try:
-        if int(input_var) not in range(0, 9):
-            print "Please enter a valid mode."
-            return False
-    except:
+    elif input_var not in ['1', '2', '3', '4', '5', '6', '7', '8']:
         print "Please enter a valid mode."
         return False
     return True
@@ -95,7 +92,8 @@ if __name__ == "__main__":
     clean_screen()
 
     # Arguments are taken from command line
-    parser = argparse.ArgumentParser(description='Reddit Crawler Client', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(description='Reddit Crawler Client',
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--hostname', action="store", dest="hostname",
                         help="Hostname to connect to the server",
                         default="localhost", type=str)
@@ -129,11 +127,14 @@ if __name__ == "__main__":
             try:
                 os.remove('src/rest_api/database/data/dbfile.sqlite')
                 logging.debug('Database emptied')
+                print 'Database emptied'
             except OSError:
+                logging.debug("Error trying to remove Database data: File doesn't exist")
                 print "Error trying to remove Database data: File doesn't exist"
         if var.lower() == 'retrieve' or var.lower() == 'refresh':
             reddit_crawler_modes.retrieve_data(chosen_subreddit, num_pages, hostname, port)
             logging.debug('Database filled')
+            print 'Database filled'
         elif var == '1':
             reddit_crawler_modes.get_score_ranking(hostname, port)
         elif var == '2':

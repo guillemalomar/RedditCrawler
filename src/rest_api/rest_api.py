@@ -7,8 +7,6 @@
 #    Availability: Public                      #
 ################################################
 import argparse
-# import errno
-# import os.path
 import sqlite3
 import json
 import logging
@@ -52,7 +50,8 @@ db = Database.initialize_db('src/rest_api/database/data/dbfile.sqlite')
 
 
 class FetchSubreddit:
-    def POST(self):
+    @staticmethod
+    def POST():
         """
         This method fetches the needed information from Reddit.com in order to
         run modes 1 (GetScoreRanking) and 2 (GetDiscussionRanking)
@@ -63,21 +62,20 @@ class FetchSubreddit:
         logging.debug('FetchSubreddit method called with parameters:' +
                       str(web.input().chosen_subreddit) + ", " +
                       str(web.input().num_pages))
-        errors = []
         try:
             subreddit = web.input().chosen_subreddit
             num_pages = web.input().num_pages
         except Exception as e:
-            errors.append(str(e) + ". Not all parameters where given, or their format is incorrect.")
-        # Create a Crawler
+            logging.error("Error in FetchSubreddit. " +
+                          "Not all parameters where given, or their format is incorrect." + str(e))
         my_crawler = Crawler(db)
-        # Make it save the data about the first n pages of a given subreddit into our database
         my_crawler.retrieve_information(subreddit, num_pages)
         del my_crawler
 
 
 class GetScoreRanking:
-    def GET(self):
+    @staticmethod
+    def GET():
         """
         This method fetches the information needed to create the score
         ranking from the SQLite DB and returns it to the main application.
@@ -91,7 +89,8 @@ class GetScoreRanking:
             cursor.execute('''SELECT submission_title, punctuation, discussion_url FROM submissions''')
             pages = cursor.fetchall()
         except sqlite3.OperationalError as e:
-            errors.append(str(e) + ". To load test data, run the application with option '--add-data")
+            errors.append('GetScoreRanking error:' + str(e))
+            logging.error('GetScoreRanking error:' + str(e))
         if len(errors) == 0:
             for page in pages:
                 result.append({'title': page[0],
@@ -103,7 +102,8 @@ class GetScoreRanking:
 
 
 class GetDiscussionRanking:
-    def GET(self):
+    @staticmethod
+    def GET():
         """
         This method fetches the information needed to create the discussion
         ranking from the SQLite DB and returns it to the main application.
@@ -117,7 +117,8 @@ class GetDiscussionRanking:
             cursor.execute('''SELECT submission_title, num_comments, discussion_url FROM submissions''')
             pages = cursor.fetchall()
         except sqlite3.OperationalError as e:
-            errors.append(str(e) + ". To load test data, run the application with option '--add-data")
+            errors.append('GetDiscussionRanking error:' + str(e))
+            logging.error('GetDiscussionRanking error:' + str(e))
         if len(errors) == 0:
             for page in pages:
                 result.append({'title': page[0],
@@ -129,7 +130,8 @@ class GetDiscussionRanking:
 
 
 class GetTopUsersSubmissionsScore:
-    def GET(self):
+    @staticmethod
+    def GET():
         """
         This method fetches the information needed to create the ranking of
         top users by submission score from the SQLite DB and returns it to
@@ -144,7 +146,8 @@ class GetTopUsersSubmissionsScore:
             cursor.execute('''SELECT submitter, punctuation, submission_title FROM submissions''')
             pages = cursor.fetchall()
         except sqlite3.OperationalError as e:
-            errors.append(str(e) + ". To load test data, run the application with option '--add-data")
+            errors.append('GetTopUsersSubmissionsScore error:' + str(e))
+            logging.error('GetTopUsersSubmissionsScore error:' + str(e))
         if len(errors) == 0:
             for page in pages:
                 result.append({'submitter': page[0],
@@ -156,7 +159,8 @@ class GetTopUsersSubmissionsScore:
 
 
 class GetTopUsersSubmissionsNum:
-    def GET(self):
+    @staticmethod
+    def GET():
         """
         This method fetches the information needed to create the ranking of
         top users by submissions from the SQLite DB and returns it to
@@ -171,7 +175,8 @@ class GetTopUsersSubmissionsNum:
             cursor.execute('''SELECT submitter, submission_title FROM submissions''')
             pages = cursor.fetchall()
         except sqlite3.OperationalError as e:
-            errors.append(str(e) + ". To load test data, run the application with option '--add-data")
+            errors.append('GetTopUsersSubmissionsNum error:' + str(e))
+            logging.error('GetTopUsersSubmissionsNum error:' + str(e))
         if len(errors) == 0:
             for page in pages:
                 result.append({'submitter': page[0],
@@ -182,7 +187,8 @@ class GetTopUsersSubmissionsNum:
 
 
 class GetTopUsersCommentsScore:
-    def GET(self):
+    @staticmethod
+    def GET():
         """
         This method fetches the information needed to create the ranking of
         top users by submissions from Reddit.com and returns it to the main
@@ -194,10 +200,9 @@ class GetTopUsersCommentsScore:
         try:
             chosen_subreddit = web.input().chosen_subreddit
         except Exception as e:
-            errors.append(str(e) + ". Not all parameters where given, or their format is incorrect.")
-        # Create a Crawler
+            errors.append('GetTopUsersCommentsScore error:' + str(e))
+            logging.error('GetTopUsersCommentsScore error:' + str(e))
         my_crawler = Crawler(db)
-        # Make it search for the top users in the subreddit, ordered by comments score
         result = my_crawler.retrieve_total_user_comments_score(chosen_subreddit)
         del my_crawler
         if len(errors) == 0:
@@ -207,7 +212,8 @@ class GetTopUsersCommentsScore:
 
 
 class GetPostsByUser:
-    def GET(self):
+    @staticmethod
+    def GET():
         """
         This method fetches the information needed to create the list
         of submissions by user from Reddit.com and returns it to the main
@@ -219,10 +225,9 @@ class GetPostsByUser:
         try:
             chosen_username = web.input().chosen_username
         except Exception as e:
-            errors.append(str(e) + ". Not all parameters where given, or their format is incorrect.")
-        # Create a Crawler
+            errors.append('GetPostsByUser error:' + str(e))
+            logging.error('GetPostsByUser error:' + str(e))
         my_crawler = Crawler(db)
-        # Make it search for the top users in the subreddit, ordered by comments score
         result = my_crawler.retrieve_user_posts(chosen_username)
         del my_crawler
         if len(errors) == 0:
@@ -232,7 +237,8 @@ class GetPostsByUser:
 
 
 class GetCommentsByUser:
-    def GET(self):
+    @staticmethod
+    def GET():
         """
         This method fetches the information needed to create the list
         of comments by user from Reddit.com and returns it to the main
@@ -244,10 +250,9 @@ class GetCommentsByUser:
         try:
             chosen_username = web.input().chosen_username
         except Exception as e:
-            errors.append(str(e) + ". Not all parameters where given, or their format is incorrect.")
-        # Create a Crawler
+            errors.append('GetCommentsByUser error:' + str(e))
+            logging.error('GetCommentsByUser error:' + str(e))
         my_crawler = Crawler(db)
-        # Make it search for the top users in the subreddit, ordered by comments score
         result = my_crawler.retrieve_user_comments(chosen_username)
         del my_crawler
         if len(errors) == 0:
@@ -257,7 +262,8 @@ class GetCommentsByUser:
 
 
 class GetKarmaStats:
-    def GET(self):
+    @staticmethod
+    def GET():
         """
         This method fetches the information needed to create the statistic
         of average comment karma by user from Reddit.com and returns it to the main
@@ -269,10 +275,9 @@ class GetKarmaStats:
         try:
             chosen_username = web.input().chosen_username
         except Exception as e:
-            errors.append(str(e) + ". Not all parameters where given, or their format is incorrect.")
-        # Create a Crawler
+            errors.append('GetKarmaStats error:' + str(e))
+            logging.error('GetKarmaStats error:' + str(e))
         my_crawler = Crawler(db)
-        # Make it search for the top users in the subreddit, ordered by comments score
         result = my_crawler.retrieve_user_avg_karma(chosen_username)
         del my_crawler
         if len(errors) == 0:

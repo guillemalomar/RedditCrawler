@@ -14,14 +14,23 @@ import os.path
 class Database:
 
     def __init__(self, db_file_name):
+        """
+        This method creates the Database object and calls the database
+        initializer.
+        :param db_file_name: name and location of the database file
+        """
         self.connection = Database.initialize_db(db_file_name)
 
     @staticmethod
     def initialize_db(db_file_name):
-        # This method checks if the file exists, and if not, tries to create the
-        # folder containing it, and a blank file in that path. After that, returns
-        # a SQLite database instance linked to that file. 'check_same_thread
-        # parameter needs to be set to False to avoid problems between petitions.
+        """
+        This method checks if the file exists, and if not, tries to create the
+        folder containing it, and a blank file in that path. After that, returns
+        a SQLite database instance linked to that file. 'check_same_thread
+        parameter needs to be set to False to avoid problems between petitions.
+        :param db_file_name: name and location of the database file
+        :return: database connection
+        """
         if not os.path.exists(os.path.dirname(db_file_name)):
             try:
                 os.makedirs(os.path.dirname(db_file_name))

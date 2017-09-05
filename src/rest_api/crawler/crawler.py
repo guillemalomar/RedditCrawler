@@ -8,17 +8,29 @@
 ################################################
 import praw
 import unidecode
+import logging
+
+logging.basicConfig(filename='logs/rest_api.log', level=logging.DEBUG)
 
 
 class Crawler:
     def __init__(self, db):
+        """
+        This method creates a Crawler, assigns a given database to it and a reddit instance
+        :param db: RestAPI database to be used
+        """
         self.db = db
         self.reddit = praw.Reddit('my_reddit_crawler')
 
     def retrieve_information(self, subreddit, hot_limit):
-        # This method the first n pages (defined by 'hot_limit' parameter) from a
-        # given subreddit (defined by 'subreddit' parameter) and stores their
-        # important information in the crawler database.
+        """
+        This method reads the first n pages (defined by 'hot_limit' parameter) from a
+        given subreddit (defined by 'subreddit' parameter) and stores their
+        important information in the crawler database.
+        :param subreddit: current subreddit
+        :param hot_limit: maximum number of pages to fetch
+        :return:
+        """
 
         try:
             subreddit = self.reddit.get_subreddit(subreddit)
@@ -57,9 +69,13 @@ class Crawler:
             self.db.commit()
 
     def retrieve_total_user_comments_score(self, chosen_subreddit):
-        # This method the first n pages (defined by 'hot_limit' parameter) from a
-        # given subreddit (defined by 'subreddit' parameter) and stores their
-        # important information in the crawler database.
+        """
+        This method reads the first 20 pages from a given subreddit
+        (defined by 'chosen_subreddit' parameter) and returns that
+        information.
+        :param chosen_subreddit: current subreddit
+        :return: a list of dictionaries with authors and scores
+        """
         try:
             subreddit = self.reddit.get_subreddit(chosen_subreddit)
         except Exception as e:
@@ -78,6 +94,13 @@ class Crawler:
         return to_return
 
     def retrieve_user_posts(self, chosen_username):
+        """
+        This method reads the first 100 submissions from a
+        given user (defined by 'chosen_username' parameter)
+        and returns them.
+        :param chosen_username: current username
+        :return: a list of dictionaries with submission titles and their subreddits
+        """
         user = self.reddit.get_redditor(chosen_username)
         posts = user.get_submitted(limit=100)
         user_posts = []
@@ -87,6 +110,13 @@ class Crawler:
         return user_posts
 
     def retrieve_user_comments(self, chosen_username):
+        """
+        This method reads the first 100 comments from a
+        given user (defined by 'chosen_username' parameter)
+        and returns them.
+        :param chosen_username: current username
+        :return: a list of dictionaries with comment bodies and their subreddits
+        """
         user = self.reddit.get_redditor(chosen_username)
         comments = user.get_comments(limit=100)
         user_comments = []
@@ -96,6 +126,13 @@ class Crawler:
         return user_comments
 
     def retrieve_user_avg_karma(self, chosen_username):
+        """
+        This method reads the first 100 comments from a
+        given user (defined by 'chosen_username' parameter)
+        and and calculates the average karma of them.
+        :param chosen_username: current username
+        :return: a list with a dictionary with the username and the avg karma
+        """
         user = self.reddit.get_redditor(chosen_username)
         gen = user.get_comments(limit=100)
         user_comments = []
