@@ -12,20 +12,27 @@ import logging
 import json
 import re
 from data_processing.data_processing import ProcessData
+from timer import Timer
 
 GET, POST = range(2)
 
-logging.basicConfig(filename='reddit_crawler.log', level=logging.DEBUG)
+logging.basicConfig(filename='logs/reddit_crawler.log', level=logging.DEBUG)
 
 
 def retrieve_data(subreddit, pages, hostname, port):
     """
     For each page in the first n pages of a given subreddit, store its data
     in the RestAPI Database.
+    :param subreddit: current subreddit
+    :param pages: max num of pages
+    :param hostname: server location
+    :param port: server port
+    :return:
     """
     logging.debug('retrieve_data method called with parameters:' +
                   str(subreddit) + ", " +
                   str(pages))
+    my_timer = Timer()
     try:
         get_response("fetch_subreddit",
                      {"chosen_subreddit": subreddit, "num_pages": pages},
@@ -35,6 +42,7 @@ def retrieve_data(subreddit, pages, hostname, port):
         print "Database updated"
     except Exception as e:
         print "e:", e
+    logging.debug('retrieve_data method total time:' + str(my_timer.finish()))
 
 _reddit_url = re.compile('.*https://www.reddit.com/r/+.*')
 
@@ -42,8 +50,12 @@ _reddit_url = re.compile('.*https://www.reddit.com/r/+.*')
 def get_score_ranking(hostname, port):
     """
     Show the top10 pages, by points
+    :param hostname: server location
+    :param port: server port
+    :return:
     """
     logging.debug('get_score_ranking method called')
+    my_timer = Timer()
     print "------------------ TOP PAGES RANKINGS BY SCORE ------------------"
     outside_pages = []
     comment_pages = []
@@ -87,13 +99,18 @@ def get_score_ranking(hostname, port):
                     break
     except Exception as e:
         print "e:", e
+    logging.debug('get_score_ranking method total time:' + str(my_timer.finish()))
 
 
 def get_discussion_ranking(hostname, port):
     """
     Show the top10 pages, by comments
+    :param hostname: server location
+    :param port: server port
+    :return:
     """
     logging.debug('get_discussion_ranking method called')
+    my_timer = Timer()
     print "---------- TOP PAGES RANKINGS BY COMMENTS SCORE ----------"
     outside_pages = []
     comment_pages = []
@@ -137,13 +154,19 @@ def get_discussion_ranking(hostname, port):
                     break
     except Exception as e:
         print "e:", e
+    logging.debug('get_discussion_ranking method total time:' + str(my_timer.finish()))
 
 
 def get_top_users_by_submissions_score(subreddit, hostname, port):
     """
     Show the top10 users of a subreddit, by submission score
+    :param subreddit: current subreddit
+    :param hostname: server location
+    :param port: server port
+    :return:
     """
     logging.debug('get_top_users_by_submissions_score method called')
+    my_timer = Timer()
     print "---------- Top Submitters ----------"
     try:
         res = json.loads(get_response("get_top_users_by_submissions_score",
@@ -160,13 +183,19 @@ def get_top_users_by_submissions_score(subreddit, hostname, port):
                     break
     except Exception as e:
         print "e:", e
+    logging.debug('get_top_users_by_submissions_score method total time:' + str(my_timer.finish()))
 
 
 def get_top_users_by_submissions(subreddit, hostname, port):
     """
-    Show the top10 users of a subreddit, by number of submissions
+    Show the top10 users of a subreddit, by submission score
+    :param subreddit: current subreddit
+    :param hostname: server location
+    :param port: server port
+    :return:
     """
     logging.debug('get_top_users_by_submissions method called')
+    my_timer = Timer()
     print "---------- Most Active Users ----------"
     try:
         res = json.loads(get_response("get_top_users_by_submissions",
@@ -183,13 +212,19 @@ def get_top_users_by_submissions(subreddit, hostname, port):
                     break
     except Exception as e:
         print "e:", e
+    logging.debug('get_top_users_by_submissions method total time:' + str(my_timer.finish()))
 
 
 def get_top_users_by_score(subreddit, hostname, port):
     """
     Show the top10 users of a subreddit, by comments score
+    :param subreddit: current subreddit
+    :param hostname: server location
+    :param port: server port
+    :return:
     """
     logging.debug('get_top_users_by_score method called')
+    my_timer = Timer()
     print "---------- Top commenters ----------"
     try:
         res = json.loads(get_response("get_top_users_by_comments_score",
@@ -203,13 +238,19 @@ def get_top_users_by_score(subreddit, hostname, port):
                 break
     except Exception as e:
         print "e:", e
+    logging.debug('get_top_users_by_score method total time:' + str(my_timer.finish()))
 
 
 def get_posts_by_user(chosen_username, hostname, port):
     """
     Show the first 10 posts for a given users
+    :param chosen_username: current username
+    :param hostname: server location
+    :param port: server port
+    :return:
     """
     logging.debug('get_posts_by_user method called')
+    my_timer = Timer()
     print "---------- Posts by the user " + str(chosen_username) + " ----------"
     try:
         res = json.loads(get_response("get_posts_by_user",
@@ -224,13 +265,19 @@ def get_posts_by_user(chosen_username, hostname, port):
                 break
     except Exception as e:
         print "e:", e
+    logging.debug('get_posts_by_user method total time:' + str(my_timer.finish()))
 
 
 def get_comments_by_user(chosen_username, hostname, port):
     """
     Show the top10 users, by comments score
+    :param chosen_username: current username
+    :param hostname: server location
+    :param port: server port
+    :return:
     """
     logging.debug('get_comments_by_user method called')
+    my_timer = Timer()
     print "---------- Comments by the user " + str(chosen_username) + " ----------"
     try:
         res = json.loads(get_response("get_comments_by_user",
@@ -247,13 +294,19 @@ def get_comments_by_user(chosen_username, hostname, port):
                 break
     except Exception as e:
         print "e:", e
+    logging.debug('get_comments_by_user method total time:' + str(my_timer.finish()))
 
 
 def get_karma_stats(chose_username, hostname, port):
     """
     Show the average karma of the comments for a given user
+    :param chose_username: current username
+    :param hostname: server location
+    :param port: server port
+    :return:
     """
     logging.debug('get_karma_stats method called')
+    my_timer = Timer()
     print "---------- Karma statistics of the user " + str(chose_username) + " ----------"
     try:
         res = json.loads(get_response("get_karma_stats",
@@ -266,12 +319,19 @@ def get_karma_stats(chose_username, hostname, port):
         print "Average_karma: " + str(res['result'][0]['avg_karma'])
     except Exception as e:
         print "e:", e
+    logging.debug('get_karma_stats method total time:' + str(my_timer.finish()))
 
 
 def get_response(fct, data, hostname, port, method=GET):
     """
     Performs the query to the server and returns a string containing the
     response.
+    :param fct: alias of the method to find in the RestAPI server
+    :param data: input data of the RestAPI method
+    :param hostname: server location
+    :param port: server port
+    :param method: type of RestAPI method (GET)
+    :return: return RestAPI method output
     """
     assert(method in (GET, POST))
     url = 'http://%s:%s/%s' % (hostname, port, fct)

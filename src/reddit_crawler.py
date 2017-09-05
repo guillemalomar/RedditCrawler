@@ -9,10 +9,11 @@
 import argparse
 import os
 import reddit_crawler_modes
-from timer import Timer
+import logging
 
 GET, POST = range(2)
 
+logging.basicConfig(filename='logs/rest_api.log', level=logging.DEBUG)
 
 def clean_screen():
     """
@@ -93,6 +94,7 @@ def check_input(input_var):
 if __name__ == "__main__":
     clean_screen()
 
+    # Arguments are taken from command line
     parser = argparse.ArgumentParser(description='Reddit Crawler Client', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--hostname', action="store", dest="hostname",
                         help="Hostname to connect to the server",
@@ -123,15 +125,15 @@ if __name__ == "__main__":
             print "***************************"
             var = raw_input("Please, enter a new mode: ")
             correct_input = check_input(var)
-        my_timer = Timer()
         if var.lower() == 'delete' or var.lower() == 'refresh':
             try:
                 os.remove('src/rest_api/database/data/dbfile.sqlite')
-                print "Database data removed"
+                logging.debug('Database emptied')
             except OSError:
                 print "Error trying to remove Database data: File doesn't exist"
         if var.lower() == 'retrieve' or var.lower() == 'refresh':
             reddit_crawler_modes.retrieve_data(chosen_subreddit, num_pages, hostname, port)
+            logging.debug('Database filled')
         elif var == '1':
             reddit_crawler_modes.get_score_ranking(hostname, port)
         elif var == '2':
@@ -148,4 +150,3 @@ if __name__ == "__main__":
             reddit_crawler_modes.get_comments_by_user(chose_username, hostname, port)
         elif var == '8':
             reddit_crawler_modes.get_karma_stats(chose_username, hostname, port)
-        my_timer.finish()

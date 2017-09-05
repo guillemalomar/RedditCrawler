@@ -17,7 +17,7 @@ class Database:
         self.connection = Database.initialize_db(db_file_name)
 
     @staticmethod
-    def initialize_db(db_file_name, clean=False):
+    def initialize_db(db_file_name):
         # This method checks if the file exists, and if not, tries to create the
         # folder containing it, and a blank file in that path. After that, returns
         # a SQLite database instance linked to that file. 'check_same_thread
@@ -28,7 +28,7 @@ class Database:
             except OSError as exc:  # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
-        if not os.path.isfile(db_file_name) or clean:
+        if not os.path.isfile(db_file_name):
             db_file = open(db_file_name, 'w')
         else:
             db_file = open(db_file_name, 'r')
