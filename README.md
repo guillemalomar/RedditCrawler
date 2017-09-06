@@ -42,7 +42,7 @@ This project is all about obtaining data from Reddit, processing it, and showing
 
 ![alt text][logo2]
 
-[logo2]: https://github.com/guillemnicolau/RedditCrawler/blob/master/documentation/FoldersAndFiles.png?raw=true "Folders and Files"
+[logo2]: https://github.com/guillemnicolau/RedditCrawler/blob/master/documentation/FilesAndFolders.png?raw=true "Folders and Files"
 
 
 ## Using the application
