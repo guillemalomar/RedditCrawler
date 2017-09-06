@@ -1,6 +1,6 @@
 import unittest
-from crawler.crawler import Crawler
-from database.database import Database
+from src.rest_api.crawler.crawler import Crawler
+from src.rest_api.database.database import Database
 import os
 import praw
 

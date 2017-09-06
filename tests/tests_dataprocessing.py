@@ -1,5 +1,5 @@
 import unittest
-from data_processing import ProcessData
+from src.data_processing.data_processing import ProcessData
 
 
 class DataProcessing_Tests(unittest.TestCase):
