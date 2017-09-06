@@ -66,6 +66,11 @@ Now that the server is running, we can execute the application. This is done by 
 ```
 ### Testing
 
+Some tests have been added to the 'tests' folder. To run them, simply type from the main project folder:
+```
+nosetests tests
+```
+
 ## Decisions taken
 
 To do this project I followed some basic instructions, but the specific components and architecture had to be chosen by me.
