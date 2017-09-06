@@ -22,7 +22,7 @@ class Crawler:
         self.db = db
         self.reddit = praw.Reddit('my_reddit_crawler')
 
-    def retrieve_information(self, subreddit, hot_limit):
+    def retrieve_information(self, subreddit, hot_limit=10):
         """
         This method reads the first n pages (defined by 'hot_limit' parameter) from a
         given subreddit (defined by 'subreddit' parameter) and stores their
@@ -68,7 +68,7 @@ class Crawler:
                                                          submission.comments.__len__()))
             self.db.commit()
 
-    def retrieve_total_user_comments_score(self, chosen_subreddit):
+    def retrieve_total_user_comments_score(self, chosen_subreddit, comments_limit=20):
         """
         This method reads the first 20 pages from a given subreddit
         (defined by 'chosen_subreddit' parameter) and returns that
@@ -82,7 +82,7 @@ class Crawler:
             print "Error when trying to obtain subreddit information:", e
             raise RuntimeError
         comments = {}
-        for submission in subreddit.get_hot(limit=20):
+        for submission in subreddit.get_hot(limit=comments_limit):
             for comment in submission.comments:
                 try:
                     comments[str(comment.author.name)] = comments.get(str(comment.author.name), 0) + comment.score
@@ -93,7 +93,7 @@ class Crawler:
             to_return.append({'author': author, 'score': score})
         return to_return
 
-    def retrieve_user_posts(self, chosen_username):
+    def retrieve_user_posts(self, chosen_username, posts_limit=100):
         """
         This method reads the first 100 submissions from a
         given user (defined by 'chosen_username' parameter)
@@ -102,14 +102,14 @@ class Crawler:
         :return: a list of dictionaries with submission titles and their subreddits
         """
         user = self.reddit.get_redditor(chosen_username)
-        posts = user.get_submitted(limit=100)
+        posts = user.get_submitted(limit=posts_limit)
         user_posts = []
         for post in posts:
             user_posts.append({'title': str(unidecode.unidecode(post.title)),
                                'subreddit': str(unidecode.unidecode(post.subreddit.title))})
         return user_posts
 
-    def retrieve_user_comments(self, chosen_username):
+    def retrieve_user_comments(self, chosen_username, comments_limit=100):
         """
         This method reads the first 100 comments from a
         given user (defined by 'chosen_username' parameter)
@@ -118,14 +118,14 @@ class Crawler:
         :return: a list of dictionaries with comment bodies and their subreddits
         """
         user = self.reddit.get_redditor(chosen_username)
-        comments = user.get_comments(limit=100)
+        comments = user.get_comments(limit=comments_limit)
         user_comments = []
         for comment in comments:
             user_comments.append({'comment': str(unidecode.unidecode(comment.body)),
                                   'subreddit': str(unidecode.unidecode(comment.subreddit.title))})
         return user_comments
 
-    def retrieve_user_avg_karma(self, chosen_username):
+    def retrieve_user_avg_karma(self, chosen_username, comments_limit=100):
         """
         This method reads the first 100 comments from a
         given user (defined by 'chosen_username' parameter)
@@ -134,7 +134,7 @@ class Crawler:
         :return: a list with a dictionary with the username and the avg karma
         """
         user = self.reddit.get_redditor(chosen_username)
-        gen = user.get_comments(limit=100)
+        gen = user.get_comments(limit=comments_limit)
         user_comments = []
         user_karma = 0
         last_ind = 1
