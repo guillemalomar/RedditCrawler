@@ -50,7 +50,6 @@ class Crawler:
                                                        num_comments INTEGER)
                 """)
         self.db.commit()
-
         for submission in subreddit.get_hot(limit=int(hot_limit)):
             cursor.execute('''INSERT OR REPLACE INTO submissions(submission_title,
                                                       external_url,
@@ -65,7 +64,7 @@ class Crawler:
                                                          str(submission.author),
                                                          submission.score,
                                                          submission.created,
-                                                         submission.comments.__len__()))
+                                                         submission.num_comments))
             self.db.commit()
 
     def retrieve_total_user_comments_score(self, chosen_subreddit, comments_limit=20):
