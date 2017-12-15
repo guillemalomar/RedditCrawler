@@ -47,6 +47,13 @@ This project is all about obtaining data from Reddit, processing it, and showing
 
 ## Using the application
 
+### First of all
+- I recommend creating a virtualenv for this project. After creating it, you should run:
+```
+~/RedditCrawler$ pip install -r requirements.txt
+```
+Now all pip packages needed have been installed.
+
 ### Executing
 - Running the server
 
