@@ -36,7 +36,7 @@ This project is all about obtaining data from Reddit, processing it, and showing
 
 ![alt text][logo]
 
-[logo]: https://raw.githubusercontent.com/guillemnicolau/RedditCrawler/master/documentation/ApplicationArchitecture.png "Application Architecture"
+[logo]: https://github.com/guillemnicolau/RedditCrawler/blob/master/documentation/ApplicationArchitecture.png?raw=true "Application Architecture"
 
 - Files and Folders
 
