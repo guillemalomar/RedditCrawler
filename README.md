@@ -96,5 +96,5 @@ Another possibility was to filter all data from the webpage myself, but after ch
 
 Another important decision was the location of the database. At first the architecture was quite different from the final one. The database was located independently from both the server and the client, and it could be accessed both from the server and the processing module. Although this probably would lead to a better performance, it was contrary to the philosophy of a RESTful API. So in the end I decided to only be able to access it through the server, as that's the logical way to design it. The crawlers module was also located in the client module at the beginning, but it makes more sense to be located in the server, as this way it can connect directly to the Subreddit webpage.
 
-test: newuser@mailservice.com
+test: newuser@mailservice.com newuser2@mailservice.com
 test2: 1234-5678-9101-1121
