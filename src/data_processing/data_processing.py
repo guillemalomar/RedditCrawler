@@ -50,7 +50,7 @@ class ProcessData:
         for list_dict in list_to_process:
             gathered_dict[str(list_dict['submitter'])] = gathered_dict.get(str(list_dict['submitter']), 0) + \
                                                          list_dict['punctuation']
-        for submitter, punctuation in gathered_dict.iteritems():
+        for submitter, punctuation in gathered_dict.items():
             list_to_return.append((punctuation, submitter))
         sorted_list = sorted(list_to_return, key=lambda x: x[0], reverse=True)
         return sorted_list
@@ -66,7 +66,7 @@ class ProcessData:
         gathered_dict = {}
         for list_dict in list_to_process:
             gathered_dict[str(list_dict['submitter'])] = gathered_dict.get(str(list_dict['submitter']), 0) + 1
-        for submitter, submission in gathered_dict.iteritems():
+        for submitter, submission in gathered_dict.items():
             list_to_return.append((submission, submitter))
         sorted_list = sorted(list_to_return, key=lambda x: x[0], reverse=True)
         return sorted_list

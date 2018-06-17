@@ -13,8 +13,10 @@ import logging
 import web
 from database.database import Database
 from crawler.crawler import Crawler
+from src.settings import rest_api_log
+from src.settings import database_file
 
-logging.basicConfig(filename='logs/rest_api.log', level=logging.DEBUG)
+logging.basicConfig(filename=rest_api_log, level=logging.DEBUG)
 
 
 class MyApplication(web.application):
@@ -33,6 +35,7 @@ class MyApplication(web.application):
         func = self.wsgifunc(*middleware)
         return web.httpserver.runsimple(func, (server_hostname, server_port))
 
+
 # Links between urls and classes
 urls = (
     '/fetch_subreddit', 'FetchSubreddit',
@@ -46,7 +49,7 @@ urls = (
     '/get_karma_stats', 'GetKarmaStats'
 )
 
-db = Database.initialize_db('src/rest_api/database/data/dbfile.sqlite')
+db = Database.initialize_db(database_file)
 
 
 class FetchSubreddit:
@@ -58,17 +61,18 @@ class FetchSubreddit:
         and persists it into the SQLite DB
         :return:
         """
-        db = Database.initialize_db('src/rest_api/database/data/dbfile.sqlite')
+        my_input = web.input(chosen_subreddit='python', num_pages=100)
+        my_db = Database.initialize_db(database_file)
         logging.debug('FetchSubreddit method called with parameters:' +
-                      str(web.input().chosen_subreddit) + ", " +
-                      str(web.input().num_pages))
+                      str(my_input.chosen_subreddit) + ", " +
+                      str(my_input.num_pages))
         try:
-            subreddit = web.input().chosen_subreddit
-            num_pages = web.input().num_pages
+            subreddit = my_input.chosen_subreddit
+            num_pages = my_input.num_pages
         except Exception as e:
             logging.error("Error in FetchSubreddit. " +
                           "Not all parameters where given, or their format is incorrect." + str(e))
-        my_crawler = Crawler(db)
+        my_crawler = Crawler(my_db)
         my_crawler.retrieve_information(subreddit, num_pages)
         del my_crawler
 
@@ -138,7 +142,6 @@ class GetTopUsersSubmissionsScore:
         the main application.
         :return: data needed to create the Ranking of top users by submission score
         """
-        logging.debug('GetTopUsersSubmissionsScore method called')
         errors = []
         result = []
         cursor = db.cursor()
@@ -167,7 +170,6 @@ class GetTopUsersSubmissionsNum:
         the main application.
         :return: data needed to create the Ranking of top users by submissions
         """
-        logging.debug('GetTopUsersSubmissionsNum method called')
         errors = []
         result = []
         cursor = db.cursor()
@@ -196,9 +198,10 @@ class GetTopUsersCommentsScore:
         :return: data needed to create the Ranking of top users by comments score
         """
         logging.debug('GetTopUsersCommentsScore method called')
+        my_input = web.input(chosen_subreddit='Python')
         errors = []
         try:
-            chosen_subreddit = web.input().chosen_subreddit
+            chosen_subreddit = my_input.chosen_subreddit
         except Exception as e:
             errors.append('GetTopUsersCommentsScore error:' + str(e))
             logging.error('GetTopUsersCommentsScore error:' + str(e))
@@ -221,9 +224,10 @@ class GetPostsByUser:
         :return: data needed to create the list of submissions by user
         """
         logging.debug('GetPostsByUser method called')
+        my_input = web.input(chosen_username='guillemnicolau')
         errors = []
         try:
-            chosen_username = web.input().chosen_username
+            chosen_username = my_input.chosen_username
         except Exception as e:
             errors.append('GetPostsByUser error:' + str(e))
             logging.error('GetPostsByUser error:' + str(e))
@@ -246,9 +250,10 @@ class GetCommentsByUser:
         :return: data needed to create the list of comments by user
         """
         logging.debug('GetCommentsByUser method called')
+        my_input = web.input(chosen_username='guillemnicolau')
         errors = []
         try:
-            chosen_username = web.input().chosen_username
+            chosen_username = my_input.chosen_username
         except Exception as e:
             errors.append('GetCommentsByUser error:' + str(e))
             logging.error('GetCommentsByUser error:' + str(e))
@@ -271,9 +276,10 @@ class GetKarmaStats:
         :return: data needed to calculate the average comment karma by user
         """
         logging.debug('GetKarmaStats method called')
+        my_input = web.input(chosen_username='guillemnicolau')
         errors = []
         try:
-            chosen_username = web.input().chosen_username
+            chosen_username = my_input.chosen_username
         except Exception as e:
             errors.append('GetKarmaStats error:' + str(e))
             logging.error('GetKarmaStats error:' + str(e))

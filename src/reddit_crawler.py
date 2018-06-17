@@ -8,12 +8,13 @@
 ################################################
 import argparse
 import os
-import reddit_crawler_modes
+from reddit_crawler_modes import *
 import logging
+from settings import rest_api_log
 
 GET, POST = range(2)
 
-logging.basicConfig(filename='logs/rest_api.log', level=logging.DEBUG)
+logging.basicConfig(filename=rest_api_log, level=logging.DEBUG)
 
 
 def clean_screen():
@@ -112,7 +113,7 @@ if __name__ == "__main__":
     port = args.port
     chosen_subreddit = args.subreddit
     num_pages = int(args.pages)
-    chose_username = args.username
+    chosen_username = args.username
 
     message_header()
     message_output()
@@ -132,7 +133,7 @@ if __name__ == "__main__":
                 logging.debug("Error trying to remove Database data: File doesn't exist")
                 print("Error trying to remove Database data: File doesn't exist")
         if var.lower() == 'retrieve' or var.lower() == 'refresh':
-            result = reddit_crawler_modes.retrieve_data(chosen_subreddit, num_pages, hostname, port)
+            result = retrieve_data(hostname, port, chosen_subreddit, num_pages)
             if result:
                 logging.debug('Database filled')
                 print('Database filled')
@@ -140,18 +141,18 @@ if __name__ == "__main__":
                 logging.debug('Database not filled')
                 print('Database not filled')
         elif var == '1':
-            reddit_crawler_modes.get_score_ranking(hostname, port)
+            get_score_ranking(hostname, port, chosen_subreddit)
         elif var == '2':
-            reddit_crawler_modes.get_discussion_ranking(hostname, port)
+            get_discussion_ranking(hostname, port, chosen_subreddit)
         elif var == '3':
-            reddit_crawler_modes.get_top_users_by_submissions_score(chosen_subreddit, hostname, port)
+            get_top_users_by_submissions_score(hostname, port, chosen_subreddit)
         elif var == '4':
-            reddit_crawler_modes.get_top_users_by_submissions(chosen_subreddit, hostname, port)
+            get_top_users_by_submissions(hostname, port, chosen_subreddit)
         elif var == '5':
-            reddit_crawler_modes.get_top_users_by_score(chosen_subreddit, hostname, port)
+            get_top_users_by_score(hostname, port, chosen_subreddit)
         elif var == '6':
-            reddit_crawler_modes.get_posts_by_user(chose_username, hostname, port)
+            get_posts_by_user(hostname, port, chosen_username)
         elif var == '7':
-            reddit_crawler_modes.get_comments_by_user(chose_username, hostname, port)
+            get_comments_by_user(hostname, port, chosen_username)
         elif var == '8':
-            reddit_crawler_modes.get_karma_stats(chose_username, hostname, port)
+            get_karma_stats(hostname, port, chosen_username)

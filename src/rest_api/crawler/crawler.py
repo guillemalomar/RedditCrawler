@@ -9,8 +9,10 @@
 import praw
 import unidecode
 import logging
+from credentials import *
+from src.settings import rest_api_log
 
-logging.basicConfig(filename='logs/rest_api.log', level=logging.DEBUG)
+logging.basicConfig(filename=rest_api_log, level=logging.DEBUG)
 
 
 class Crawler:
@@ -20,20 +22,23 @@ class Crawler:
         :param db: RestAPI database to be used
         """
         self.db = db
-        self.reddit = praw.Reddit('my_reddit_crawler')
+        self.reddit = praw.Reddit(client_id=client_id,
+                                  client_secret=client_secret,
+                                  user_agent=user_agent,
+                                  username=username,
+                                  password=password)
 
     def retrieve_information(self, subreddit, hot_limit=10):
         """
         This method reads the first n pages (defined by 'hot_limit' parameter) from a
         given subreddit (defined by 'subreddit' parameter) and stores their
         important information in the crawler database.
-        :param subreddit: current subreddit
+        :param my_subreddit: current subreddit
         :param hot_limit: maximum number of pages to fetch
         :return:
         """
-        print("subreddit: {}".format(subreddit))
         try:
-            subreddit = self.reddit.get_subreddit(subreddit)
+            my_subreddit = self.reddit.subreddit(subreddit)
         except Exception as e:
             print("Error when trying to obtain subreddit information: {}".format(e))
             raise RuntimeError
@@ -50,7 +55,7 @@ class Crawler:
                                                        num_comments INTEGER)
                 """)
         self.db.commit()
-        for submission in subreddit.get_hot(limit=int(hot_limit)):
+        for my_submission in my_subreddit.hot(limit=int(hot_limit)):
             cursor.execute('''INSERT OR REPLACE INTO submissions(submission_title,
                                                       external_url,
                                                       discussion_url,
@@ -58,13 +63,13 @@ class Crawler:
                                                       punctuation,
                                                       creation_date,
                                                       num_comments)
-                              VALUES(?,?,?,?,?,?,?)''', (str(unidecode.unidecode(submission.title)),
-                                                         str(unidecode.unidecode(submission.permalink)),
-                                                         str(unidecode.unidecode(submission.url)),
-                                                         str(submission.author),
-                                                         submission.score,
-                                                         submission.created,
-                                                         submission.num_comments))
+                              VALUES(?,?,?,?,?,?,?)''', (str(unidecode.unidecode(my_submission.title)),
+                                                         str(unidecode.unidecode(my_submission.permalink)),
+                                                         str(unidecode.unidecode(my_submission.url)),
+                                                         str(my_submission.author),
+                                                         my_submission.score,
+                                                         my_submission.created,
+                                                         my_submission.num_comments))
             self.db.commit()
 
     def retrieve_total_user_comments_score(self, chosen_subreddit, comments_limit=20):
@@ -76,19 +81,20 @@ class Crawler:
         :return: a list of dictionaries with authors and scores
         """
         try:
-            subreddit = self.reddit.get_subreddit(chosen_subreddit)
+            my_subreddit = self.reddit.subreddit(chosen_subreddit)
         except Exception as e:
             print("Error when trying to obtain subreddit information: {}".format(e))
             raise RuntimeError
         comments = {}
-        for submission in subreddit.get_hot(limit=comments_limit):
+        for submission in self.reddit.subreddit(chosen_subreddit).hot(limit=comments_limit):
+            print("submission:", submission)
             for comment in submission.comments:
                 try:
                     comments[str(comment.author.name)] = comments.get(str(comment.author.name), 0) + comment.score
                 except Exception as e:
                     print("Error: {}".format(e))
         to_return = []
-        for author, score in comments.iteritems():
+        for author, score in comments.items():
             to_return.append({'author': author, 'score': score})
         return to_return
 
@@ -100,8 +106,8 @@ class Crawler:
         :param chosen_username: current username
         :return: a list of dictionaries with submission titles and their subreddits
         """
-        user = self.reddit.get_redditor(chosen_username)
-        posts = user.get_submitted(limit=posts_limit)
+        user = self.reddit.redditor(chosen_username)
+        posts = user.submissions.top('all')
         user_posts = []
         for post in posts:
             user_posts.append({'title': str(unidecode.unidecode(post.title)),
@@ -116,8 +122,8 @@ class Crawler:
         :param chosen_username: current username
         :return: a list of dictionaries with comment bodies and their subreddits
         """
-        user = self.reddit.get_redditor(chosen_username)
-        comments = user.get_comments(limit=comments_limit)
+        user = self.reddit.redditor(chosen_username)
+        comments = user.comments.top('all')
         user_comments = []
         for comment in comments:
             user_comments.append({'comment': str(unidecode.unidecode(comment.body)),
@@ -132,8 +138,8 @@ class Crawler:
         :param chosen_username: current username
         :return: a list with a dictionary with the username and the avg karma
         """
-        user = self.reddit.get_redditor(chosen_username)
-        gen = user.get_comments(limit=comments_limit)
+        user = self.reddit.redditor(chosen_username)
+        gen = user.comments.top('all')
         user_comments = []
         user_karma = 0
         last_ind = 1
