@@ -29,8 +29,8 @@ def message_header():
     Print method for the header of the application
     :return:
     """
-    print "******************************\n* Reddit Crawler Application *\n******************************"
-    print "This is an application that obtains statistics of a given subreddit or reddit user"
+    print("******************************\n* Reddit Crawler Application *\n******************************")
+    print("This is an application that obtains statistics of a given subreddit or reddit user")
 
 
 def show_modes():
@@ -38,15 +38,15 @@ def show_modes():
     Print method for the available data processing modes
     :return:
     """
-    print "Available modes:"
-    print " 1 - Get Pages by Score Ranking\n" + \
-          " 2 - Get Pages by Comment Ranking\n" + \
-          " 3 - Get Users by Submissions Score Ranking\n" + \
-          " 4 - Get Users by Submissions Quantity\n" + \
-          " 5 - Get Users by Comment Score\n" + \
-          " 6 - Get Posts by User\n" + \
-          " 7 - Get Comments by User\n" + \
-          " 8 - Get Karma Stats from User"
+    print("Available modes:")
+    print(" 1 - Get Pages by Score Ranking\n" +
+          " 2 - Get Pages by Comment Ranking\n" +
+          " 3 - Get Users by Submissions Score Ranking\n" +
+          " 4 - Get Users by Submissions Quantity\n" +
+          " 5 - Get Users by Comment Score\n" +
+          " 6 - Get Posts by User\n" +
+          " 7 - Get Comments by User\n" +
+          " 8 - Get Karma Stats from User")
 
 
 def message_output():
@@ -55,12 +55,12 @@ def message_output():
     :return:
     """
     show_modes()
-    print " RETRIEVE - Fill database with subreddit data\n" + \
-          " REFRESH  - Update database with subreddit data\n" + \
-          " DELETE   - Delete all database data\n" + \
-          " HELP     - Show the initial application message\n" + \
-          " MODES    - Show the available modes\n" + \
-          " EXIT     - Quit application"
+    print(" RETRIEVE - Fill database with subreddit data\n" +
+          " REFRESH  - Update database with subreddit data\n" +
+          " DELETE   - Delete all database data\n" +
+          " HELP     - Show the initial application message\n" +
+          " MODES    - Show the available modes\n" +
+          " EXIT     - Quit application")
 
 
 def check_input(input_var):
@@ -70,7 +70,7 @@ def check_input(input_var):
     :return: True (Mode to execute) / False (Mode executed or incorrect)
     """
     if input_var.lower() == 'exit':
-        print "The application will now end."
+        print("The application will now end.")
         clean_screen()
         raise SystemExit
     elif input_var.lower() == 'modes':
@@ -82,7 +82,7 @@ def check_input(input_var):
     elif input_var.lower() in ['retrieve', 'delete', 'refresh']:
         return True
     elif input_var not in ['1', '2', '3', '4', '5', '6', '7', '8']:
-        print "Please enter a valid mode."
+        print("Please enter a valid mode.")
         return False
     return True
 
@@ -120,21 +120,25 @@ if __name__ == "__main__":
     while True:
         correct_input = False
         while not correct_input:
-            print "***************************"
-            var = raw_input("Please, enter a new mode: ")
+            print("***************************")
+            var = input("Please, enter a new mode: ")
             correct_input = check_input(var)
         if var.lower() == 'delete' or var.lower() == 'refresh':
             try:
                 os.remove('src/rest_api/database/data/dbfile.sqlite')
                 logging.debug('Database emptied')
-                print 'Database emptied'
+                print('Database emptied')
             except OSError:
                 logging.debug("Error trying to remove Database data: File doesn't exist")
-                print "Error trying to remove Database data: File doesn't exist"
+                print("Error trying to remove Database data: File doesn't exist")
         if var.lower() == 'retrieve' or var.lower() == 'refresh':
-            reddit_crawler_modes.retrieve_data(chosen_subreddit, num_pages, hostname, port)
-            logging.debug('Database filled')
-            print 'Database filled'
+            result = reddit_crawler_modes.retrieve_data(chosen_subreddit, num_pages, hostname, port)
+            if result:
+                logging.debug('Database filled')
+                print('Database filled')
+            else:
+                logging.debug('Database not filled')
+                print('Database not filled')
         elif var == '1':
             reddit_crawler_modes.get_score_ranking(hostname, port)
         elif var == '2':

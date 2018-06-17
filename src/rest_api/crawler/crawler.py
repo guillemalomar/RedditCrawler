@@ -31,11 +31,11 @@ class Crawler:
         :param hot_limit: maximum number of pages to fetch
         :return:
         """
-
+        print("subreddit: {}".format(subreddit))
         try:
             subreddit = self.reddit.get_subreddit(subreddit)
         except Exception as e:
-            print "Error when trying to obtain subreddit information:", e
+            print("Error when trying to obtain subreddit information: {}".format(e))
             raise RuntimeError
 
         cursor = self.db.cursor()
@@ -78,7 +78,7 @@ class Crawler:
         try:
             subreddit = self.reddit.get_subreddit(chosen_subreddit)
         except Exception as e:
-            print "Error when trying to obtain subreddit information:", e
+            print("Error when trying to obtain subreddit information: {}".format(e))
             raise RuntimeError
         comments = {}
         for submission in subreddit.get_hot(limit=comments_limit):
@@ -86,7 +86,7 @@ class Crawler:
                 try:
                     comments[str(comment.author.name)] = comments.get(str(comment.author.name), 0) + comment.score
                 except Exception as e:
-                    print "Error:", e
+                    print("Error: {}".format(e))
         to_return = []
         for author, score in comments.iteritems():
             to_return.append({'author': author, 'score': score})
