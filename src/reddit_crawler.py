@@ -8,12 +8,13 @@
 ################################################
 import argparse
 import os
-import reddit_crawler_modes
+from reddit_crawler_modes import *
 import logging
+from settings import rest_api_log
 
 GET, POST = range(2)
 
-logging.basicConfig(filename='logs/rest_api.log', level=logging.DEBUG)
+logging.basicConfig(filename=rest_api_log, level=logging.DEBUG)
 
 
 def clean_screen():
@@ -29,8 +30,8 @@ def message_header():
     Print method for the header of the application
     :return:
     """
-    print "******************************\n* Reddit Crawler Application *\n******************************"
-    print "This is an application that obtains statistics of a given subreddit or reddit user"
+    print("******************************\n* Reddit Crawler Application *\n******************************")
+    print("This is an application that obtains statistics of a given subreddit or reddit user")
 
 
 def show_modes():
@@ -38,15 +39,15 @@ def show_modes():
     Print method for the available data processing modes
     :return:
     """
-    print "Available modes:"
-    print " 1 - Get Pages by Score Ranking\n" + \
-          " 2 - Get Pages by Comment Ranking\n" + \
-          " 3 - Get Users by Submissions Score Ranking\n" + \
-          " 4 - Get Users by Submissions Quantity\n" + \
-          " 5 - Get Users by Comment Score\n" + \
-          " 6 - Get Posts by User\n" + \
-          " 7 - Get Comments by User\n" + \
-          " 8 - Get Karma Stats from User"
+    print("Available modes:")
+    print(" 1 - Get Pages by Score Ranking\n" +
+          " 2 - Get Pages by Comment Ranking\n" +
+          " 3 - Get Users by Submissions Score Ranking\n" +
+          " 4 - Get Users by Submissions Quantity\n" +
+          " 5 - Get Users by Comment Score\n" +
+          " 6 - Get Posts by User\n" +
+          " 7 - Get Comments by User\n" +
+          " 8 - Get Karma Stats from User")
 
 
 def message_output():
@@ -55,12 +56,12 @@ def message_output():
     :return:
     """
     show_modes()
-    print " RETRIEVE - Fill database with subreddit data\n" + \
-          " REFRESH  - Update database with subreddit data\n" + \
-          " DELETE   - Delete all database data\n" + \
-          " HELP     - Show the initial application message\n" + \
-          " MODES    - Show the available modes\n" + \
-          " EXIT     - Quit application"
+    print(" RETRIEVE - Fill database with subreddit data\n" +
+          " REFRESH  - Update database with subreddit data\n" +
+          " DELETE   - Delete all database data\n" +
+          " HELP     - Show the initial application message\n" +
+          " MODES    - Show the available modes\n" +
+          " EXIT     - Quit application")
 
 
 def check_input(input_var):
@@ -70,7 +71,7 @@ def check_input(input_var):
     :return: True (Mode to execute) / False (Mode executed or incorrect)
     """
     if input_var.lower() == 'exit':
-        print "The application will now end."
+        print("The application will now end.")
         clean_screen()
         raise SystemExit
     elif input_var.lower() == 'modes':
@@ -82,7 +83,7 @@ def check_input(input_var):
     elif input_var.lower() in ['retrieve', 'delete', 'refresh']:
         return True
     elif input_var not in ['1', '2', '3', '4', '5', '6', '7', '8']:
-        print "Please enter a valid mode."
+        print("Please enter a valid mode.")
         return False
     return True
 
@@ -112,7 +113,7 @@ if __name__ == "__main__":
     port = args.port
     chosen_subreddit = args.subreddit
     num_pages = int(args.pages)
-    chose_username = args.username
+    chosen_username = args.username
 
     message_header()
     message_output()
@@ -120,34 +121,38 @@ if __name__ == "__main__":
     while True:
         correct_input = False
         while not correct_input:
-            print "***************************"
-            var = raw_input("Please, enter a new mode: ")
+            print("***************************")
+            var = input("Please, enter a new mode: ")
             correct_input = check_input(var)
         if var.lower() == 'delete' or var.lower() == 'refresh':
             try:
                 os.remove('src/rest_api/database/data/dbfile.sqlite')
                 logging.debug('Database emptied')
-                print 'Database emptied'
+                print('Database emptied')
             except OSError:
                 logging.debug("Error trying to remove Database data: File doesn't exist")
-                print "Error trying to remove Database data: File doesn't exist"
+                print("Error trying to remove Database data: File doesn't exist")
         if var.lower() == 'retrieve' or var.lower() == 'refresh':
-            reddit_crawler_modes.retrieve_data(chosen_subreddit, num_pages, hostname, port)
-            logging.debug('Database filled')
-            print 'Database filled'
+            result = retrieve_data(hostname, port, chosen_subreddit, num_pages)
+            if result:
+                logging.debug('Database filled')
+                print('Database filled')
+            else:
+                logging.debug('Database not filled')
+                print('Database not filled')
         elif var == '1':
-            reddit_crawler_modes.get_score_ranking(hostname, port)
+            get_score_ranking(hostname, port, chosen_subreddit)
         elif var == '2':
-            reddit_crawler_modes.get_discussion_ranking(hostname, port)
+            get_discussion_ranking(hostname, port, chosen_subreddit)
         elif var == '3':
-            reddit_crawler_modes.get_top_users_by_submissions_score(chosen_subreddit, hostname, port)
+            get_top_users_by_submissions_score(hostname, port, chosen_subreddit)
         elif var == '4':
-            reddit_crawler_modes.get_top_users_by_submissions(chosen_subreddit, hostname, port)
+            get_top_users_by_submissions(hostname, port, chosen_subreddit)
         elif var == '5':
-            reddit_crawler_modes.get_top_users_by_score(chosen_subreddit, hostname, port)
+            get_top_users_by_score(hostname, port, chosen_subreddit)
         elif var == '6':
-            reddit_crawler_modes.get_posts_by_user(chose_username, hostname, port)
+            get_posts_by_user(hostname, port, chosen_username)
         elif var == '7':
-            reddit_crawler_modes.get_comments_by_user(chose_username, hostname, port)
+            get_comments_by_user(hostname, port, chosen_username)
         elif var == '8':
-            reddit_crawler_modes.get_karma_stats(chose_username, hostname, port)
+            get_karma_stats(hostname, port, chosen_username)

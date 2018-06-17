@@ -24,6 +24,10 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.idea
+src/rest_api/database/data/
+credentials.py
+src/settings.py
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
